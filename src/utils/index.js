@@ -94,7 +94,7 @@ export function html2Img(el, transferSuccessFn) {
                 initalImg.src = dataUrl; //由于图片异步加载，一定要等initalImg加载好，再设置src属性
                 initalImg.onload = () => {
                     const iconImg = new Image();
-                    iconImg.src = require("@/assets/logo.png");
+                    iconImg.src = require("@/assets/images/logo.png");
                     iconImg.onload = () => {
                         const ctx = canvas1.getContext("2d");
                         // 绘制图片

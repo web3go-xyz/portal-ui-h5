@@ -10,72 +10,38 @@
           <img :src="logoImg" alt="" />
         </a>
       </div>
-      <div class="common-header">
-        <div class="nav-left">
-          <ul class="nav-list">
-            <li
-              class="nav-item"
-              :class="{ active: index === actNavInddex }"
-              v-for="(item, index) in navLeft"
-              :key="index"
-              @click.stop="clickNav(item, index)"
-            >
-              <span>{{ item.name }}</span>
-            </li>
-          </ul>
+      <div class="actions">
+        <div class="user-account">
+          <i class="el-icon-user"></i>
         </div>
-        <div class="nav-right">
-          <div class="search">
-            <input type="text" placeholder="Search" />
-          </div>
-          <ul class="nav-list">
-            <li class="nav-item" v-for="(item, index) in navRight" :key="index">
-              <a :href="item.url" target="blank">{{ item.name }}</a>
-            </li>
-          </ul>
-          <span class="create button" @click="buildNewQuery()"
-            ><img :src="plusImg" alt="" />Create</span
-          >
-          <!-- <div
-            v-if="!userInfo"
-            class="login-btn"
-            @click="$router.push({ name: 'Login' })"
-          >
-            login
-          </div>
-          <div v-else>
-            <el-dropdown
-              class="avatar-container right-menu-item hover-effect"
-              trigger="click"
-            >
-              <div class="avatar-wrapper">
-                <img
-                  :src="
-                    userInfo.avatar || require('@/assets/images/avatar.png')
-                  "
-                  class="user-avatar"
-                />
-              </div>
-              <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item
-                  @click.native="$router.push({ name: 'UserInfo' })"
-                  >My Info</el-dropdown-item
-                >
-                <el-dropdown-item divided @click.native="logout">
-                  <span>Logout</span>
-                </el-dropdown-item>
-              </el-dropdown-menu>
-            </el-dropdown>
-            <span class="username">{{ userInfo.name }}</span>
-          </div> -->
+        <div class="search">
+          <i class="el-icon-search"></i>
+        </div>
+        <div class="more-menus" @click="showMoreMenus = !showMoreMenus">
+          <i class="el-icon-s-grid"></i>
         </div>
       </div>
     </div>
-    <div class="coming" v-if="isShowComing">
-      <img src="./assets/images/coming.png" alt="" />
-      <p>Coming soon...</p>
+
+    <div class="div-more-menus">
+      <el-collapse-transition>
+        <div v-show="showMoreMenus">
+          <div
+            v-for="m in menus"
+            :key="m.name"
+            class="menu-item"
+            @click="menuClick(m)"
+            :class="{ active: m.name == activeMenu.name }"
+          >
+            <div class="text">{{ m.name }}</div>
+            <div class="flag">
+              <img src="./assets/images/menu-active-flag.png" />
+            </div>
+          </div>
+        </div>
+      </el-collapse-transition>
     </div>
-    <router-view class="common-view" v-else />
+    <router-view class="common-view" />
   </div>
 </template>
 
@@ -83,41 +49,41 @@
 import request from "@/utils/request";
 import "@/assets/font/rubik/index.css";
 import logoImg from "@/assets/images/logo.png";
-import plusImg from "@/assets/images/home/plus.png";
 export default {
   name: "App",
   data() {
     return {
       userInfo: null,
-      actNavInddex: 0,
+      activeMenu: {},
       logoImg,
-      plusImg,
-      isShowComing: false,
-      navLeft: [
+
+      showMoreMenus: true,
+      menus: [
         {
           name: "Dashboard",
           route: "HomePage",
+          ready: true,
         },
         {
           name: "Profile",
-          isShowComing: true,
+          ready: false,
         },
         {
           name: "My Analytics",
-          isShowComing: true,
+          ready: false,
         },
-      ],
-      searchVisible: true,
-      navRight: [
         {
           name: "Docs",
           url: "https://doc.web3go.xyz/",
+          ready: true,
         },
         {
           name: "About Us",
           url: "https://melz243.wixsite.com/web3go",
+          ready: true,
         },
       ],
+      searchVisible: true,
     };
   },
   created() {
@@ -132,7 +98,10 @@ export default {
         this.userInfo = JSON.parse(userInfo);
       }
     });
+
+    this.activeMenu = this.menus[0];
   },
+
   watch: {
     $route() {
       const userInfo = localStorage.getItem("userInfo");
@@ -162,24 +131,31 @@ export default {
       localStorage.removeItem("userInfo");
       this.userInfo = null;
     },
-    clickNav(item, index) {
-      const { isShowComing, route } = item;
-      this.actNavInddex = index;
-      this.isShowComing = isShowComing;
-      if (route) {
-        this.$router.push({
-          name: route,
-        });
+    menuClick(item) {
+      console.log("menuClick:", item);
+      let ready = item.ready;
+      let route = item.route;
+
+      if (ready == false) {
+        route = "NotReady";
       }
+
+      if (route) {
+        let currentRoute = this.$route;
+        // console.log(currentRoute);
+        if (currentRoute.name != route) {
+          this.$router.push({
+            name: route,
+          });
+        }
+        this.activeMenu = item;
+      } else if (item.url) {
+        window.open(item.url, "_blank");
+      }
+
+      this.showMoreMenus = false;
     },
-    buildNewQuery() {
-      this.$router.push({
-        name: "CustomQuery",
-        query: {
-          editSupport: true,
-        },
-      });
-    },
+
     goHome() {
       this.$router.push({ name: "HomePage" });
     },
@@ -188,197 +164,40 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.login-btn {
-  margin-left: 20px;
-  cursor: pointer;
-  color: #38cb98;
-  &:hover {
-    opacity: 0.7;
-  }
-}
-.username {
-  vertical-align: middle;
-}
-.avatar-container {
-  margin-left: 24px;
-  vertical-align: middle;
-  margin-right: 8px;
-
-  .avatar-wrapper {
-    margin-top: 5px;
-    position: relative;
-
-    .user-avatar {
-      cursor: pointer;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-    }
-
-    .el-icon-caret-bottom {
-      cursor: pointer;
-      position: absolute;
-      right: -20px;
-      top: 25px;
-      font-size: 12px;
-    }
-  }
-}
-.head {
-  right: 0;
-  position: fixed;
-  top: 0;
-  left: 0;
+.div-more-menus {
+  width: 100%;
   background: #fff;
-  display: flex;
-  z-index: 10;
-  align-items: center;
-  height: 60px;
-  box-shadow: 0px 3px 8px 0px rgba(0, 0, 0, 0.06);
-}
-.coming {
-  height: calc(100vh - 200px);
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  justify-content: center;
-  img {
-    width: 160px;
-    margin-bottom: 5px;
-  }
-  p {
-    font-size: 18px;
-    font-family: Rubik-Regular, Rubik;
-    font-weight: 400;
-    color: rgba(41, 40, 40, 0.6);
-  }
-}
-.common-header {
-  width: 100%;
-}
-.common-header .button {
-  display: inline-block;
-  width: 89px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6px;
-  border: 1px solid #38cb98;
-}
-.common-header .button.sing {
-  cursor: pointer;
-  margin-left: 12px;
-  font-size: 16px;
-  font-family: Rubik-Regular, Rubik;
-  font-weight: 400;
-  color: #38cb98;
-}
-.common-header .button.create {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  margin-left: 40px;
-  font-size: 16px;
-  font-family: Rubik-Regular, Rubik;
-  font-weight: 400;
-  color: #38cb98;
-}
-.common-header .button.create img {
-  width: 12px;
-  margin-right: 4px;
-}
-.search {
-  width: 280px;
-  height: 32px;
-  background: #f5f7f9 url("./assets/images/home/search.png") no-repeat 16px
-    center;
-  background-size: 16px 16px;
-  border-radius: 20px;
-  padding-left: 16px;
-  box-sizing: border-box;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-}
-.search input {
-  width: 100%;
-  height: 100%;
-  outline: none;
-  margin-left: 30px;
-  border: none;
-  background: #f5f7f9;
-}
-.nav-left {
-  margin-left: 24px;
-  flex: 1;
-}
-.nav-right {
-  display: flex;
-  margin-right: 32px;
-  align-items: center;
-}
-.nav-right .nav-item:hover::after {
-  content: none;
-}
-.common-header {
-  flex: 1280px auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.head .logo a {
-  width: 200px;
-  display: flex;
-  align-items: center;
-}
-.head .logo img {
-  margin-left: 32px;
-  height: 36px;
-}
-.nav-list {
-  margin: 0;
-  margin-left: 20px;
-  padding: 0px;
-  display: flex;
-  align-items: center;
-  list-style: none;
-}
-.nav-item.active,
-.nav-item:hover {
-  cursor: pointer;
-  position: relative;
-}
-.nav-item.active span,
-.nav-item:hover span,
-.nav-item:hover a {
-  color: #38cb98;
-}
-.nav-item.active::after,
-.nav-item:hover::after {
   position: absolute;
-  content: "";
-  display: inline-block;
-  bottom: -20px;
-  width: 80%;
-  left: 10%;
-  height: 3px;
-  background: #38cb98;
-  border-radius: 2px;
-}
-.nav-item:not(:first-child) {
-  margin-left: 40px;
-}
-.nav-item a {
-  text-decoration: none;
-  font-size: 16px;
-  font-family: Rubik-Regular, Rubik;
-  font-weight: 400;
-  color: rgba(41, 40, 40, 0.7);
-  line-height: 24px;
-}
-.common-header .logo img {
+  top: 45px;
+  z-index: 999;
+  border-top: solid 1px #eee;
+  .menu-item {
+    padding: 10px 24px;
+    height: 24px;
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+    &:hover {
+      background: #ebf9f4;
+    }
+    &.active {
+      background: #ebf9f4;
+
+      .flag {
+        display: block;
+        img {
+          width: 24px;
+        }
+      }
+    }
+    .text {
+      font-size: 14px;
+      color: #292828;
+    }
+    .flag {
+      display: none;
+    }
+  }
 }
 </style>
 <style lang="less">
@@ -407,27 +226,6 @@ body {
 }
 body.dark-theme,
 body.white-theme {
-  @media screen and (max-width: 1440px) {
-    .padding-2-side {
-      padding-left: 100px;
-      padding-right: 100px;
-    }
-    .extend-2-side {
-      margin-left: -100px;
-      margin-right: -100px;
-    }
-  }
-  @media screen and (min-width: 1440px) {
-    .padding-2-side {
-      padding-left: 12vw;
-      padding-right: 12vw;
-    }
-    .extend-2-side {
-      margin-left: -12vw;
-      margin-right: -12vw;
-    }
-  }
-
   #app {
     font-family: "Rubik", "Avenir", Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -435,43 +233,67 @@ body.white-theme {
     text-align: center;
   }
   .main-container {
-    padding-top: 60px;
+    padding-top: 44px;
     // min-height: 100vh;
-    min-height: calc(100vh - 60px);
+    min-height: calc(100vh - 44px);
     &.no-head {
       padding-top: 0;
       & > .head {
         display: none;
       }
     }
-  }
-  .main-container .logo {
-    text-align: left;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
+
+    .head {
+      right: 0;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background: #fff;
+      display: flex;
+      z-index: 10;
+      align-items: center;
+      height: 44px;
+      // box-shadow: 0px 3px 8px 0px rgba(0, 0, 0, 0.06);
+
+      justify-content: space-between;
+
+      .logo {
+        text-align: left;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+
+        a {
+          display: flex;
+          align-items: center;
+        }
+        img {
+          margin-left: 24px;
+          height: 28px;
+        }
+      }
+
+      .actions {
+        display: flex;
+        font-size: 24px;
+        color: #545353;
+
+        .user-account {
+          margin-right: 20px;
+          cursor: pointer;
+        }
+        .search {
+          margin-right: 20px;
+          cursor: pointer;
+        }
+        .more-menus {
+          margin-right: 24px;
+          cursor: pointer;
+        }
+      }
+    }
   }
 
-  header {
-    border-bottom: 1px solid;
-  }
-
-  .nav {
-    display: flex;
-    justify-content: space-between;
-  }
-  .nav .nav-item {
-    cursor: pointer;
-    padding: 10px 10px;
-    width: 100px;
-  }
-  .nav-item.goBack {
-    margin-right: auto;
-  }
-  .nav-item.goHome {
-    margin-left: auto;
-  }
   .el-range-editor {
     border-width: 0px;
   }
@@ -747,7 +569,6 @@ body.white-theme {
   .el-icon-arrow-right {
     opacity: 0.6;
   }
-  border-left: 1px solid #17c684;
 }
 .el-range-editor .el-range-input {
   background-color: #212121;

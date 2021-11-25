@@ -25,6 +25,9 @@ import MoonRiver from '@/components/moonRiver/index'
 import MoonRiverAction from '@/components/moonRiver/action'
 import AddressTagManage from '@/components/sysConfig/AddressTagManage'
 
+import NotReady from '@/components/NotReady'
+
+
 Vue.use(Router)
 
 export default new Router({
@@ -34,6 +37,11 @@ export default new Router({
             path: '/',
             name: 'HomePage',
             component: HomePage
+        },
+        {
+            path: '/NotReady',
+            name: 'NotReady',
+            component: NotReady
         },
         {
             path: '/Login',

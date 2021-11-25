@@ -57,7 +57,7 @@ export default {
       activeMenu: {},
       logoImg,
 
-      showMoreMenus: true,
+      showMoreMenus: false,
       menus: [
         {
           name: "Dashboard",

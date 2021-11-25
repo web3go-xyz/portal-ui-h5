@@ -1,51 +1,7 @@
 <template>
   <div class="homepage">
-    <div class="slide">
-      <ul class="fSort">
-        <li v-for="(fItem, findex) in slideList" :key="findex" class="fItem">
-          <div
-            class="name fname"
-            @click="clickSlide(fItem, findex)"
-            :class="{ active: defaultActiveSlideIndex === findex }"
-          >
-            <span class="icon" :class="fItem.name"></span>
-            <span class="text">{{ fItem.name }}</span>
-            <span
-              v-if="fItem.children && fItem.children.length"
-              class="arrow"
-              :class="{ hide: fItem.isShow }"
-            ></span>
-          </div>
-          <ul
-            v-if="fItem.children && fItem.children.length && fItem.isShow"
-            class="sSort"
-          >
-            <li
-              class="sItem"
-              v-for="(sItem, sindex) in fItem.children"
-              :key="`${findex}${sindex}`"
-            >
-              <div
-                class="name sname"
-                @click="clickSlide(sItem, `${findex}-${sindex}`)"
-                :class="{
-                  active: defaultActiveSlideIndex === `${findex}-${sindex}`,
-                }"
-              >
-                <span class="icon"></span>
-                <span class="text">{{ sItem.name }}</span>
-              </div>
-            </li>
-          </ul>
-        </li>
-      </ul>
-    </div>
     <div class="main">
       <div class="wrap">
-        <div class="adv-v2">
-          <img class="adv-banner-v2" src="./../assets/images/banner-v2.png" />
-        </div>
-
         <div class="case-wrapper clearfix">
           <div class="card" v-show="showCardView('Featured')">
             <h2 class="card-title">Featured</h2>
@@ -225,20 +181,61 @@
           <p>No data…</p>
         </div>
       </div>
-      <div class="foot">
-        <ul>
-          <li v-for="(foot, index) in footList" :key="index">
-            <a :href="foot.url" target="blank"
-              ><img
-                v-if="foot.icon"
-                :src="require(`../assets/images/home/${foot.icon}.png`)"
-                alt=""
-              /><span v-else>{{ foot.name }}</span></a
+    </div>
+
+    <div class="slideIcon" @click="showSlide" v-if="slideExpand == false">
+      <i class="el-icon-s-unfold"></i>
+    </div>
+
+    <el-drawer
+      title=""
+      :with-header="false"
+      :visible.sync="slideExpand"
+      :direction="slideDirection"
+      :before-close="handleDrawerClose"
+      :size="200"
+    >
+      <div class="slide">
+        <ul class="fSort">
+          <li v-for="(fItem, findex) in slideList" :key="findex" class="fItem">
+            <div
+              class="name fname"
+              @click="clickSlide(fItem, findex)"
+              :class="{ active: defaultActiveSlideIndex === findex }"
             >
+              <span class="icon" :class="fItem.name"></span>
+              <span class="text">{{ fItem.name }}</span>
+              <span
+                v-if="fItem.children && fItem.children.length"
+                class="arrow"
+                :class="{ hide: fItem.isShow }"
+              ></span>
+            </div>
+            <ul
+              v-if="fItem.children && fItem.children.length && fItem.isShow"
+              class="sSort"
+            >
+              <li
+                class="sItem"
+                v-for="(sItem, sindex) in fItem.children"
+                :key="`${findex}${sindex}`"
+              >
+                <div
+                  class="name sname"
+                  @click="clickSlide(sItem, `${findex}-${sindex}`)"
+                  :class="{
+                    active: defaultActiveSlideIndex === `${findex}-${sindex}`,
+                  }"
+                >
+                  <span class="icon"></span>
+                  <span class="text">{{ sItem.name }}</span>
+                </div>
+              </li>
+            </ul>
           </li>
         </ul>
       </div>
-    </div>
+    </el-drawer>
 
     <el-dialog
       title="Confirm"
@@ -296,6 +293,9 @@ export default {
       businessImg,
       defaultActiveSlideIndex: 0,
       activeTagFilter: "",
+
+      slideExpand: false,
+      slideDirection: "ltr",
       slideList: [
         {
           name: "All",
@@ -340,28 +340,7 @@ export default {
           ],
         },
       ],
-      footDesc:
-        "Web3Go is a multi-blockchain data analytics platform that allows everyone to play with and visualize blockchain data. Rooted in the Polkadot ecosystem, Web3Go avails itself as a powerful tool for Polkadot enthusiasts to interact, surface the signal, and grasp the value behind different blockchains.",
-      footList: [
-        {
-          name: "Twitter",
-          url: "https://twitter.com/Web3Go",
-          icon: "twitter",
-        },
-        {
-          name: "Medium",
-          url: "https://web3go.medium.com/",
-          icon: "medium",
-        },
-        {
-          name: "Docs",
-          url: "https://doc.web3go.xyz/",
-        },
-        {
-          name: "About us",
-          url: "https://melz243.wixsite.com/web3go",
-        },
-      ],
+
       msg: "Welcome to Data Analysis",
 
       erc20DashboardList: [
@@ -463,6 +442,15 @@ export default {
     });
   },
   methods: {
+    showSlide() {
+      this.slideExpand = true;
+    },
+    handleDrawerClose(done) {
+      this.hideSlide();
+    },
+    hideSlide() {
+      this.slideExpand = false;
+    },
     mapCardType(type) {
       const obj = {
         Moonriver: "Moonriver Staking",
@@ -656,176 +644,193 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="less" >
+.slideIcon {
+  position: fixed;
+  top: 50px;
+  background: #fff;
+  padding: 8px 12px;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+  box-shadow: 2px 0px 8px 0px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  i {
+    font-size: 20px;
+  }
+}
+
 .homepage {
-  display: flex;
-  min-height: calc(100vh - 60px);
-  .card {
-    .card-title {
-      text-align: left;
-      margin: 48px 0 16px;
-      height: 40px;
-      font-size: 32px;
-      font-family: Rubik-Medium, Rubik;
-      font-weight: 500;
-      color: #292828;
-      line-height: 40px;
+  min-height: calc(100vh - 44px);
+  .main {
+    .wrap {
+      .case-wrapper {
+      }
     }
-    .card-content {
-      display: flex;
-      flex-wrap: wrap;
-      .card-item {
-        cursor: pointer;
-        width: 400px;
-        margin-bottom: 24px;
-        margin-right: 10px;
-        // &:not(:nth-child(4n)) {
-        //   margin-right: 20px;
-        // }
-        &-head {
-          border-top-left-radius: 10px;
-          border-top-right-radius: 10px;
-          background: #ffffff;
-          box-sizing: border-box;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 24px 24px 16px;
-          .logo {
-            width: 32px;
-            height: 32px;
+  }
+}
+
+.card {
+  padding: 30px 24px 0px 24px;
+  .card-title {
+    font-size: 20px;
+    color: #292828;
+    text-align: left;
+    font-family: Rubik-Medium, Rubik;
+  }
+  .card-content {
+    display: flex;
+    flex-wrap: wrap;
+    .card-item {
+      width: 100%;
+      cursor: pointer;
+      margin-bottom: 24px;
+      // background: #ffffff;
+      border-radius: 16px;
+
+      &-head {
+        border-top-left-radius: 16px;
+        border-top-right-radius: 16px;
+        background: #ffffff;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 16px;
+        .logo {
+          width: 20px;
+          height: 20px;
+        }
+        .type {
+          padding-left: 5px;
+          text-align: left;
+          flex: 1;
+          font-size: 16px;
+          font-family: Rubik-Medium, Rubik;
+          font-weight: 500;
+          color: #292828;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        .option {
+          position: relative;
+          &:hover > .option-con {
+            display: block;
           }
-          .type {
-            padding-left: 11px;
-            text-align: left;
-            flex: 1;
-            font-size: 18px;
-            font-family: Rubik-Medium, Rubik;
-            font-weight: 500;
-            color: #292828;
-            line-height: 26px;
-            height: 30px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+          &-icon {
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
           }
-          .option {
-            position: relative;
-            &:hover > .option-con {
-              display: block;
-            }
-            &-icon {
-              cursor: pointer;
-              width: 16px;
-              height: 16px;
-            }
-            &-con {
-              &::after {
-                position: absolute;
-                top: -10px;
-                right: 10px;
-                content: "";
-                display: inline-block;
-                width: 0;
-                height: 0;
-                border-left: 10px solid transparent;
-                border-right: 10px solid transparent;
-                border-bottom: 10px solid #ffffff;
-                box-shadow: 0px -12px 18px 0px rgb(0 0 0 / 12%);
-              }
-              display: none;
+          &-con {
+            &::after {
               position: absolute;
-              top: 30px;
-              right: -12px;
-              width: 89px;
-              padding: 13px 0;
-              background: #ffffff;
-              box-shadow: 0px 4px 24px 0px rgba(0, 0, 0, 0.12);
-              p {
-                cursor: pointer;
-                margin: 0;
-                height: 40px;
-                padding-left: 12px;
-                display: flex;
-                align-items: center;
-                &:hover {
-                  background: #ebf9f4;
-                }
-                img {
-                  width: 16px;
-                  height: 16px;
-                  margin-right: 8px;
-                }
-                span {
-                  font-size: 14px;
-                  font-family: Rubik-Regular, Rubik;
-                  font-weight: 400;
-                  color: #545353;
-                }
+              top: -10px;
+              right: 10px;
+              content: "";
+              display: inline-block;
+              width: 0;
+              height: 0;
+              border-left: 10px solid transparent;
+              border-right: 10px solid transparent;
+              border-bottom: 10px solid #ffffff;
+              box-shadow: 0px -12px 18px 0px rgb(0 0 0 / 12%);
+            }
+            display: none;
+            position: absolute;
+            top: 30px;
+            right: -12px;
+            width: 89px;
+            padding: 13px 0;
+            background: #ffffff;
+            box-shadow: 0px 4px 24px 0px rgba(0, 0, 0, 0.12);
+            p {
+              cursor: pointer;
+              margin: 0;
+              height: 40px;
+              padding-left: 12px;
+              display: flex;
+              align-items: center;
+              &:hover {
+                background: #ebf9f4;
+              }
+              img {
+                width: 16px;
+                height: 16px;
+                margin-right: 8px;
+              }
+              span {
+                font-size: 14px;
+                font-family: Rubik-Regular, Rubik;
+                font-weight: 400;
+                color: #545353;
               }
             }
           }
         }
-        &-con {
-          border-bottom-left-radius: 10px;
-          border-bottom-right-radius: 10px;
-          background: #ffffff;
+      }
+      &-con {
+        border-bottom-left-radius: 16px;
+        border-bottom-right-radius: 16px;
+        background: #ffffff;
+        display: flex;
+        align-items: center;
+        padding: 0 15px 15px;
+        justify-content: center;
+        height: 120px;
+        img {
+          width: 100%;
+          height: 100%;
+        }
+      }
+      &-foot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 14px;
+        margin-top: 12px;
+        font-family: Rubik-Regular, Rubik;
+        font-weight: 400;
+        color: #545353;
+        background: #f5f7f9;
+        .name {
+          text-align: left;
+          flex: 1;
+        }
+        .clickNum {
           display: flex;
           align-items: center;
-          padding: 0 24px;
-          justify-content: center;
-          height: 170px;
+          justify-content: flex-end;
+          width: 44px;
+          margin: 0;
           img {
-            width: 100%;
+            width: 16px;
+            height: 16px;
+            margin-right: 4px;
           }
         }
-        &-foot {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          font-size: 14px;
-          margin-top: 17px;
-          font-family: Rubik-Regular, Rubik;
-          font-weight: 400;
-          color: #545353;
-          .name {
-            text-align: left;
-            flex: 1;
-          }
-          .clickNum {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            width: 44px;
-            margin: 0;
-            img {
-              width: 16px;
-              height: 16px;
-              margin-right: 4px;
-            }
-          }
+      }
+      &.create {
+        background: #fff;
+        border: 2px dashed #38cb98;
+        min-height: 272px;
+        text-align: center;
+        img {
+          margin-top: 65px;
+          width: 46px;
+          margin-bottom: 42px;
         }
-        &.create {
-          background: #fff;
-          border: 2px dashed #38cb98;
-          min-height: 272px;
-          text-align: center;
-          img {
-            margin-top: 65px;
-            width: 46px;
-            margin-bottom: 42px;
-          }
-          p {
-            margin: 0;
-            font-size: 16px;
-            font-family: Rubik-Medium, Rubik;
-            font-weight: 500;
-            color: #38cb98;
-          }
+        p {
+          margin: 0;
+          font-size: 16px;
+          font-family: Rubik-Medium, Rubik;
+          font-weight: 500;
+          color: #38cb98;
         }
       }
     }
   }
 }
+
 .empty {
   height: calc(100vh - 450px);
   display: flex;
@@ -843,90 +848,7 @@ export default {
     color: rgba(41, 40, 40, 0.6);
   }
 }
-.foot {
-  position: fixed;
-  background: #fff;
-  left: 200px;
-  box-shadow: 0px -4px 8px 0px rgba(0, 0, 0, 0.02);
-  bottom: 0;
-  right: 0;
-  ul {
-    width: 100%;
-    list-style: none;
-    display: flex;
-    padding: 0;
-    margin: 0;
-    height: 60px;
-    align-items: center;
-    justify-content: center;
-    li {
-      a {
-        display: flex;
-        align-items: center;
-        text-decoration: none;
-        font-size: 18px;
-        font-family: Rubik-Regular, Rubik;
-        font-weight: 400;
-        color: #292828;
-        img {
-          width: 24px;
-        }
-        span {
-          &:hover {
-            color: #21dbc1;
-          }
-        }
-      }
-      &:not(:last-child) {
-        margin-right: 40px;
-      }
-    }
-  }
-}
-.main {
-  padding-left: 200px;
-  box-sizing: border-box;
-  flex: 1;
-  .wrap {
-    padding-bottom: 70px;
-    min-height: calc(100vh - 302px);
-  }
-  .adv {
-    margin: 32px 24px 8px;
-    box-sizing: border-box;
-    background: #2a2828;
-    border-radius: 6px;
-    display: flex;
-    justify-content: space-between;
-  }
-  .adv-text {
-    flex-grow: 1;
-    text-align: left;
-    padding: 24px 24px;
-    .adv-text-main {
-      font-size: 24px;
-      color: #fff;
-    }
-    .adv-text-comment {
-      padding-top: 10px;
-      font-size: 14px;
-      color: #a6acab;
-    }
-  }
-  .adv-banner {
-    height: 140px;
-  }
-  .adv-v2 {
-    margin: 30px 24px 8px;
-    box-sizing: border-box;
-    border-radius: 6px;
-    display: flex;
-    justify-content: space-between;
-  }
-  .adv-banner-v2 {
-    width: 100%;
-  }
-}
+
 .slide {
   position: fixed;
   left: 0;
@@ -1095,139 +1017,5 @@ export default {
   padding: 0;
   margin: 0;
   list-style: none;
-}
-.title {
-  margin-top: 80px;
-  margin-bottom: 50px;
-  font-size: 36px;
-  font-weight: bold;
-  color: #ffffff;
-  text-shadow: 0px 2px 9px rgba(0, 0, 0, 0.5);
-}
-
-.case-wrapper {
-  padding: 0 16px 0 24px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-}
-
-.case-item {
-  cursor: pointer;
-  width: 340px;
-  height: 315px;
-  border-radius: 6px;
-  opacity: 0.9;
-  display: block;
-  margin: 24px 20px 0 0;
-  position: relative;
-  transition: all 0.5s;
-}
-.case-item:hover {
-  margin-top: 10px;
-  height: 310px;
-  background-color: #303131;
-}
-
-.case-item-title {
-  text-align: left;
-  margin: 32px 24px 16px;
-  font-size: 24px;
-  font-weight: bold;
-  color: #ffffff;
-}
-.case-item-description {
-  text-align: left;
-  margin: 0 24px;
-  overflow: hidden;
-  font-size: 18px;
-  color: rgba(255, 255, 255, 0.85);
-  line-height: 22px;
-}
-.case-item-created {
-  display: flex;
-  margin: 32px 24px 16px;
-
-  color: rgba(255, 255, 255, 0.6);
-}
-.case-item-created .created-name {
-  margin-left: 10px;
-  font-size: 16px;
-  color: rgba(255, 255, 255, 0.87);
-  flex-grow: 1;
-  text-align: left;
-}
-.case-item-created .item-img img {
-  width: 89px;
-  height: 111px;
-  margin-left: 24px;
-}
-.case-item-view {
-  position: absolute;
-  font-size: 16px;
-  font-weight: bold;
-
-  line-height: 19px;
-  text-align: left;
-  left: 24px;
-  bottom: 30px;
-}
-.case-item-view img {
-  width: 14px;
-}
-
-.erc20 {
-  background: #323232;
-}
-.erc20 .case-item-view {
-  color: #17c684;
-}
-.kusama {
-  background: #212121;
-}
-.kusama .case-item-view {
-  color: #17c684;
-}
-.karura {
-  background: #e03156;
-}
-.karura .case-item-view {
-  color: #ffffff;
-}
-.add-new {
-  background: rgba(24, 24, 24, 0.8);
-  box-shadow: 0px 10px 20px 0px rgba(0, 0, 0, 0.3);
-  border-radius: 6px;
-  border: 2px dashed #17c684;
-}
-
-.case-item-add-new-icon img {
-  margin-top: 113px;
-  width: 46px;
-}
-.case-item-add-new-description {
-  font-size: 16px;
-  font-weight: bold;
-  color: #17c684;
-  margin-top: 40px;
-}
-
-.customQuery {
-  background: #323232;
-}
-.customQuery .case-item-view {
-  color: #17c684;
-}
-
-.case-item-action {
-  position: absolute;
-  right: 10px;
-  top: 5px;
-  .el-dropdown-text {
-    font-size: 18px;
-    line-height: 25px;
-    height: 30px;
-    width: 50px;
-  }
 }
 </style>

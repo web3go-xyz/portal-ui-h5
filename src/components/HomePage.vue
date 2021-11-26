@@ -659,7 +659,6 @@ export default {
 }
 
 .homepage {
-  min-height: calc(100vh - 44px);
   .main {
     .wrap {
       .case-wrapper {

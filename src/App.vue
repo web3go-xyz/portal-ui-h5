@@ -23,7 +23,7 @@
       </div>
     </div>
 
-    <div class="div-more-menus">
+    <div class="div-more-menus-list">
       <el-collapse-transition>
         <div v-show="showMoreMenus">
           <div
@@ -162,44 +162,7 @@ export default {
   },
 };
 </script>
-
-<style lang="less" scoped>
-.div-more-menus {
-  width: 100%;
-  background: #fff;
-  position: absolute;
-  top: 45px;
-  z-index: 999;
-  border-top: solid 1px #eee;
-  .menu-item {
-    padding: 10px 24px;
-    height: 24px;
-    display: flex;
-    justify-content: space-between;
-    cursor: pointer;
-    &:hover {
-      background: #ebf9f4;
-    }
-    &.active {
-      background: #ebf9f4;
-
-      .flag {
-        display: block;
-        img {
-          width: 24px;
-        }
-      }
-    }
-    .text {
-      font-size: 14px;
-      color: #292828;
-    }
-    .flag {
-      display: none;
-    }
-  }
-}
-</style>
+ 
 <style lang="less">
 html,
 body {
@@ -233,9 +196,7 @@ body.white-theme {
     text-align: center;
   }
   .main-container {
-    padding-top: 44px;
-    // min-height: 100vh;
-    min-height: calc(100vh - 44px);
+    height: 100vh;
     &.no-head {
       padding-top: 0;
       & > .head {
@@ -244,10 +205,6 @@ body.white-theme {
     }
 
     .head {
-      right: 0;
-      position: fixed;
-      top: 0;
-      left: 0;
       background: #fff;
       display: flex;
       z-index: 10;
@@ -291,6 +248,45 @@ body.white-theme {
           cursor: pointer;
         }
       }
+    }
+    .div-more-menus-list {
+      width: 100%;
+      background: #fff;
+      position: absolute;
+      top: 45px;
+      z-index: 999;
+      border-top: solid 1px #eee;
+      .menu-item {
+        padding: 10px 24px;
+        height: 24px;
+        display: flex;
+        justify-content: space-between;
+        cursor: pointer;
+        &:hover {
+          background: #ebf9f4;
+        }
+        &.active {
+          background: #ebf9f4;
+
+          .flag {
+            display: block;
+            img {
+              width: 24px;
+            }
+          }
+        }
+        .text {
+          font-size: 14px;
+          color: #292828;
+        }
+        .flag {
+          display: none;
+        }
+      }
+    }
+    .common-view {
+      height: calc(100% - 44px);
+      overflow: auto;
     }
   }
 

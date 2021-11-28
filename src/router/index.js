@@ -110,6 +110,9 @@ export default new Router({
         {
             path: '/ParaChainProfiler',
             name: 'ParaChainProfiler',
+            meta: {
+                noHead: true
+            },
             component: ParaChainProfiler4Kusama
         },
         {

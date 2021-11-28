@@ -4,7 +4,7 @@
     class="main-container"
     :class="{ 'no-head': $route.meta.noHead }"
   >
-    <div class="head" v-if="$route.name ==='HomePage'">
+    <div class="head" v-if="$route.meta.noHead">
       <div class="logo" @click="goHome">
         <a href="/">
           <img :src="logoImg" alt="" />
@@ -41,7 +41,10 @@
         </div>
       </el-collapse-transition>
     </div>
-    <router-view class="common-view" />
+    <router-view
+      class="common-view"
+      :class="{ 'no-head': $route.meta.noHead }"
+    />
   </div>
 </template>
 
@@ -62,28 +65,28 @@ export default {
         {
           name: "Dashboard",
           route: "HomePage",
-          ready: true,
+          ready: true
         },
         {
           name: "Profile",
-          ready: false,
+          ready: false
         },
         {
           name: "My Analytics",
-          ready: false,
+          ready: false
         },
         {
           name: "Docs",
           url: "https://doc.web3go.xyz/",
-          ready: true,
+          ready: true
         },
         {
           name: "About Us",
           url: "https://melz243.wixsite.com/web3go",
-          ready: true,
-        },
+          ready: true
+        }
       ],
-      searchVisible: true,
+      searchVisible: true
     };
   },
   created() {
@@ -108,15 +111,15 @@ export default {
       if (userInfo) {
         this.userInfo = JSON.parse(userInfo);
       }
-    },
+    }
   },
   methods: {
     loadAddressLabelList() {
       let self = this;
       request({
         url: "/config-manage/getAddressTagList",
-        method: "post",
-      }).then((resp) => {
+        method: "post"
+      }).then(resp => {
         if (resp) {
           // debugger
           self.$store.commit("app/SET_ADDRESS_TAG", resp.list);
@@ -145,7 +148,7 @@ export default {
         // console.log(currentRoute);
         if (currentRoute.name != route) {
           this.$router.push({
-            name: route,
+            name: route
           });
         }
         this.activeMenu = item;
@@ -158,11 +161,11 @@ export default {
 
     goHome() {
       this.$router.push({ name: "HomePage" });
-    },
-  },
+    }
+  }
 };
 </script>
- 
+
 <style lang="less">
 html,
 body {
@@ -287,6 +290,9 @@ body.white-theme {
     .common-view {
       height: calc(100% - 44px);
       overflow: auto;
+      &.no-head {
+        height: 100%;
+      }
     }
   }
 
@@ -446,13 +452,12 @@ body.white-theme {
     padding-left: 0;
   }
   .el-table td:first-child .cell {
-    padding-left: 24px;
+    
   }
   .el-table th .cell {
     padding-left: 0;
   }
   .el-table th:first-child .cell {
-    padding-left: 24px;
   }
   .el-select-dropdown__list {
     padding: 0;

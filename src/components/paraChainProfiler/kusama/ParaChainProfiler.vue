@@ -9,14 +9,7 @@
         <div class="share-wrap">
           <img
             title="Share to Twitter"
-            @click="handleShare('twitter')"
-            src="@/assets/images/twitter@2x.png"
-            alt=""
-          />
-          <img
-            title="Capture snapshot"
-            @click="handleShare('download')"
-            src="@/assets/images/download@2x.png"
+            src="@/assets/images/point.png"
             alt=""
           />
         </div>
@@ -48,17 +41,22 @@
       </div>
     </div>
     <div class="g-wrap">
-      <div class="data-table" v-if="tabType === 'On-going'">
+      <div
+        class="data-table"
+        :class="isClientX ? 'horizontal' : ''"
+        v-if="tabType === 'On-going'"
+      >
         <div id="to-img-div" :class="{ 'min-height': !showTableColumn }">
           <el-table
             ref="table"
+            @row-click="viewContributionDetail"
             v-loading="loading"
             :element-loading-text="'loading '"
             element-loading-spinner="el-icon-loading"
             :data="onGoingParaChainCrowdloanTableData"
             style="width: 100%"
           >
-            <el-table-column label="Parachain" width="240">
+            <el-table-column label="Parachain" width="200">
               <template slot-scope="scope">
                 <el-tooltip :content="scope.row.description" placement="top">
                   <div class="row-crowdloanId">
@@ -71,34 +69,30 @@
                 </el-tooltip>
               </template>
             </el-table-column>
-            <el-table-column
-              v-if="showTableColumn"
-              label="First Lease"
-              width="75"
-              align="right"
-            >
+            <el-table-column label="Lease" align="right">
               <template slot-scope="scope">
                 <div class="row-firstLease">
-                  {{ scope.row.firstLease }}
+                  {{ scope.row.firstLease }}-{{ scope.row.lastLease }}
                 </div>
               </template></el-table-column
             >
             <el-table-column
-              v-if="showTableColumn"
-              label="Last Lease"
-              width="128"
-              align="right"
+              :class-name="showTableColumn ? '' : 'column-left'"
+              align="left"
+              label="Progress"
             >
               <template slot-scope="scope">
-                <div class="row-lastLease">
-                  {{ scope.row.lastLease }}
+                <div class="row-raised-cap">
+                  <span class="percentage">{{ scope.row.percentageText }}</span>
                 </div>
               </template>
             </el-table-column>
 
             <el-table-column
+              v-if="isClientX"
               :class-name="showTableColumn ? '' : 'column-left'"
               align="left"
+              width="200"
               label="Raised / Cap"
               sortable
               :sort-method="sortRaised"
@@ -113,7 +107,6 @@
                     :text-inside="true"
                     :percentage="scope.row.percentage"
                   ></el-progress>
-                  <span class="percentage">{{ scope.row.percentageText }}</span>
                   <span class="formatedRaisedCap">{{
                     scope.row.formatedRaisedCap
                   }}</span>
@@ -121,33 +114,10 @@
               </template>
             </el-table-column>
 
-            <el-table-column
-              v-if="showTableColumn"
-              label="Expiration"
-              align="left"
-              width="180"
-            >
+            <el-table-column v-if="showTableColumn && isClientX" label="Status">
               <template slot-scope="scope">
-                <div class="row-expiration">
-                  Block: {{ scope.row.expirationBlock }}
-                </div>
-              </template>
-            </el-table-column>
-
-            <el-table-column v-if="showTableColumn" label="Status" width="100">
-              <template slot-scope="scope">
-                <div class="row-status">
+                <div class="row-status status">
                   {{ scope.row.status }}
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column v-if="showTableColumn" label="" width="100">
-              <template slot-scope="scope">
-                <div
-                  class="row-button"
-                  @click="viewContributionDetail(scope.row)"
-                >
-                  view <i class="el-icon-back"></i>
                 </div>
               </template>
             </el-table-column>
@@ -176,12 +146,13 @@
             id="to-img-div"
             :key="Math.random()"
             v-loading="loading"
+            @row-click="viewContributionDetail"
             element-loading-text="loading "
             element-loading-spinner="el-icon-loading"
             :data="paraChainCrowdloanTableData"
             style="width: 100%"
           >
-            <el-table-column label="Parachain" width="240">
+            <el-table-column label="Parachain" width="200">
               <template slot-scope="scope">
                 <el-tooltip :content="scope.row.description" placement="top">
                   <div class="row-crowdloanId">
@@ -194,32 +165,28 @@
                 </el-tooltip>
               </template>
             </el-table-column>
-            <el-table-column
-              v-if="showTableColumn"
-              label="First Lease"
-              width="75"
-              align="right"
-            >
+            <el-table-column label="Lease" align="right">
               <template slot-scope="scope">
                 <div class="row-firstLease">
-                  {{ scope.row.firstLease }}
+                  {{ scope.row.firstLease }}-{{ scope.row.lastLease }}
                 </div>
               </template></el-table-column
             >
             <el-table-column
-              v-if="showTableColumn"
-              label="Last Lease"
-              width="128"
-              align="right"
+              :class-name="showTableColumn ? '' : 'column-left'"
+              align="left"
+              label="Progress"
             >
               <template slot-scope="scope">
-                <div class="row-lastLease">
-                  {{ scope.row.lastLease }}
+                <div class="row-raised-cap">
+                  <span class="percentage">{{ scope.row.percentageText }}</span>
                 </div>
               </template>
             </el-table-column>
 
             <el-table-column
+              v-if="isClientX"
+              width="200"
               :class-name="showTableColumn ? '' : 'column-left'"
               align="left"
               label="Raised / Cap"
@@ -236,7 +203,6 @@
                     :text-inside="true"
                     :percentage="scope.row.percentage"
                   ></el-progress>
-                  <div class="percentage">{{ scope.row.percentageText }}</div>
 
                   <div class="formatedRaisedCap">
                     {{ scope.row.formatedRaisedCap }}
@@ -245,33 +211,10 @@
               </template>
             </el-table-column>
 
-            <el-table-column
-              v-if="showTableColumn"
-              label="Expiration"
-              align="left"
-              width="180"
-            >
-              <template slot-scope="scope">
-                <div class="row-expiration">
-                  Block: {{ scope.row.expirationBlock }}
-                </div>
-              </template>
-            </el-table-column>
-
-            <el-table-column v-if="showTableColumn" label="Status" width="100">
+            <el-table-column v-if="showTableColumn && isClientX" label="Status">
               <template slot-scope="scope">
                 <div class="row-status">
                   {{ scope.row.status }}
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column v-if="showTableColumn" label="" width="100">
-              <template slot-scope="scope">
-                <div
-                  class="row-button"
-                  @click="viewContributionDetail(scope.row)"
-                >
-                  view <i class="el-icon-back"></i>
                 </div>
               </template>
             </el-table-column>
@@ -291,6 +234,7 @@ export default {
   name: "ParaChainProfiler",
   data() {
     return {
+      isClientX: utils.isClientX(),
       parachainCrowdloanTitle: "Kusama",
       showTableColumn: true,
       tabType: "On-going",
@@ -308,11 +252,11 @@ export default {
       activeHistoryRoundIndex: 0,
       historyBlockList: [],
 
-      refreshInterval: {},
+      refreshInterval: {}
     };
   },
   components: {
-    ParaChainAnalytics,
+    ParaChainAnalytics
   },
   computed: {
     activeHistoryRound() {
@@ -324,7 +268,7 @@ export default {
         }
       }
       return {};
-    },
+    }
   },
   created() {
     let self = this;
@@ -341,8 +285,8 @@ export default {
     }
     Promise.all([
       self.getParaChainList(),
-      service.getPolkParaChainRoundList(),
-    ]).then((res) => {
+      service.getPolkParaChainRoundList()
+    ]).then(res => {
       self.polkParaChainRoundList = res[1];
 
       if (self.polkParaChainRoundList.length > 0) {
@@ -441,11 +385,11 @@ export default {
           lastUpdateTime: row.lastUpdateTime,
           projectName: row.projectName,
           iconPath: row.iconPath,
-          chainType: self.parachainCrowdloanChainType,
+          chainType: self.parachainCrowdloanChainType
         },
         params: {
-          paramsOnPage: this.query,
-        },
+          paramsOnPage: this.query
+        }
       });
     },
     formatedRaisedCap(row) {
@@ -582,7 +526,7 @@ export default {
 
     getParaChainList() {
       var self = this;
-      return service.getPolkParaChainList().then((resp) => {
+      return service.getPolkParaChainList().then(resp => {
         if (resp && resp.list) {
           self.paraChainList = resp.list;
         }
@@ -595,13 +539,13 @@ export default {
       self.loading = true;
       service
         .getPolkParaChainCrowdloanList({
-          expirationBlocks: param.expirationBlocks,
+          expirationBlocks: param.expirationBlocks
         })
-        .then((resp) => {
+        .then(resp => {
           self.loading = false;
           if (resp) {
             self.onGoingParaChainCrowdloanTableData = resp.list;
-            self.onGoingParaChainCrowdloanTableData.forEach((row) => {
+            self.onGoingParaChainCrowdloanTableData.forEach(row => {
               let nameIcon = self.getParachainNameIcon(row);
               row.parachainName = nameIcon.parachainName;
               row.iconPath = nameIcon.iconPath;
@@ -614,7 +558,7 @@ export default {
             });
           }
         })
-        .catch((err) => {
+        .catch(err => {
           self.loading = false;
           console.error(err);
         });
@@ -625,13 +569,13 @@ export default {
       self.loading = true;
       service
         .getPolkParaChainCrowdloanList({
-          expirationBlocks: param.expirationBlocks,
+          expirationBlocks: param.expirationBlocks
         })
-        .then((resp) => {
+        .then(resp => {
           self.loading = false;
           if (resp) {
             self.paraChainCrowdloanTableData = resp.list;
-            self.paraChainCrowdloanTableData.forEach((row) => {
+            self.paraChainCrowdloanTableData.forEach(row => {
               let nameIcon = self.getParachainNameIcon(row);
               row.parachainName = nameIcon.parachainName;
               row.iconPath = nameIcon.iconPath;
@@ -644,7 +588,7 @@ export default {
             });
           }
         })
-        .catch((err) => {
+        .catch(err => {
           self.loading = false;
           console.error(err);
         });
@@ -655,17 +599,17 @@ export default {
       this.$router.push({
         name: "ParaChainCrowdloanContributionDetail",
         query: {
-          crowdloanId: row.crowdloanId,
+          crowdloanId: row.crowdloanId
         },
         params: {
-          paramsOnPage: this.query,
-        },
+          paramsOnPage: this.query
+        }
       });
-    },
-  },
+    }
+  }
 };
 </script>
-<style lang='less'>
+<style lang="less">
 .paraChainProfiler {
   .back {
     widows: 100%;
@@ -713,7 +657,7 @@ export default {
   height: 44px;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid #E9E9E9;
+  border-bottom: 1px solid #e9e9e9;
 }
 .paraChainProfiler .nav-left {
 }
@@ -728,7 +672,7 @@ export default {
   font-size: 16px;
   font-weight: bold;
   font-family: Rubik-Regular, Rubik;
-  color: #7F7E7E;
+  color: #7f7e7e;
   line-height: 22px;
 }
 .paraChainProfiler .nav-left .tab-item.act,
@@ -853,7 +797,8 @@ export default {
   color: rgba(41, 40, 40, 0.6);
 }
 .paraChainProfiler .row-status {
-  text-align: left;
+  text-align: right;
+  margin-right: 16px;
   color: rgba(41, 40, 40, 0.6);
 }
 .paraChainProfiler .el-table td,
@@ -871,7 +816,7 @@ export default {
 }
 </style>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped lang='less'>
+<style scoped lang="less">
 .content {
 }
 .select-row {
@@ -916,7 +861,7 @@ export default {
   height: 24px;
   border-radius: 40px;
   margin-right: 5px;
-  margin-left: 24px;
+  margin-left: 16px;
 }
 .row-crowdloanId paraId {
   margin-left: 5px;

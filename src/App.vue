@@ -358,7 +358,6 @@ body.white-theme {
     background-color: #111111;
   }
   .g-wrap {
-    width: 1280px;
     margin: 0 auto;
   }
   /* 表格边框 */

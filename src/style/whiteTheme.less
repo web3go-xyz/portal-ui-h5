@@ -2,11 +2,11 @@
 body.white-theme {
   .table-operation-span {
     font-size: 14px;
-    color: #38CB98;
+    color: #38cb98;
     cursor: pointer;
 
     &:hover {
-      opacity: .7;
+      opacity: 0.7;
     }
   }
 
@@ -23,12 +23,16 @@ body.white-theme {
   }
 
   .el-input__inner:hover {
-    border-color: #C0C4CC !important;
+    border-color: #c0c4cc !important;
   }
 
-  .el-input-number__decrease:hover:not(.is-disabled)~.el-input .el-input__inner:not(.is-disabled),
-  .el-input-number__increase:hover:not(.is-disabled)~.el-input .el-input__inner:not(.is-disabled) {
-    border-color: #38CB98 !important;
+  .el-input-number__decrease:hover:not(.is-disabled)
+    ~ .el-input
+    .el-input__inner:not(.is-disabled),
+  .el-input-number__increase:hover:not(.is-disabled)
+    ~ .el-input
+    .el-input__inner:not(.is-disabled) {
+    border-color: #38cb98 !important;
   }
 
   .el-table,
@@ -82,7 +86,7 @@ body.white-theme {
     box-shadow: 0px 18px 34px 0px rgb(41 40 40 / 10%);
     z-index: 2;
     position: relative;
-    transition: all .2s;
+    transition: all 0.2s;
   }
 
   .el-select-dropdown {
@@ -94,13 +98,11 @@ body.white-theme {
   .el-input-number__increase {
     border-color: rgba(41, 40, 40, 0.4) !important;
     background: white !important;
-
   }
 
   .el-input-number__decrease {
     border-color: rgba(41, 40, 40, 0.4) !important;
     background: white !important;
-
   }
 
   .el-icon-date:before {
@@ -113,22 +115,19 @@ body.white-theme {
 
   .common-back-title {
     background: white;
-    height: 60px;
+    height: 44px;
     text-align: left;
-    padding-left: 85px;
-    padding-right: 100px;
-    line-height: 60px;
-
+    padding-left: 24px;
+    padding-right: 24px;
+    line-height: 44px;
     .el-icon-back {
-      padding: 10px;
-      cursor: pointer;
-      opacity: 0.7;
-      font-weight: bold;
-      transform: none;
-      color: rgba(41, 40, 40, 1);
-
-      &:hover {
-        opacity: .5;
+      position: relative;
+      bottom: -5px;
+      width: 24px;
+      height: 24px;
+      background: url("../assets/images/back.png") no-repeat center center;
+      &::before {
+        content: none;
       }
     }
 
@@ -147,14 +146,14 @@ body.white-theme {
 
   .el-select-dropdown__item.hover,
   .el-select-dropdown__item:hover {
-    background-color: #ECF6F2 !important;
+    background-color: #ecf6f2 !important;
   }
 
-  .el-table--enable-row-hover .el-table__body tr:hover>td {
+  .el-table--enable-row-hover .el-table__body tr:hover > td {
     background-color: transparent !important;
   }
 
-  .el-table th>.cell {
+  .el-table th > .cell {
     color: rgba(41, 40, 40, 0.6) !important;
   }
 
@@ -227,5 +226,9 @@ body.white-theme {
   .el-button:hover {
     color: white !important;
     border: 1px solid #17c684;
+  }
+  .data-table {
+    width: 1280px;
+    overflow: auto;
   }
 }

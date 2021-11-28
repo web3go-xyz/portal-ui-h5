@@ -709,37 +709,43 @@ export default {
 }
 .paraChainProfiler .nav {
   display: flex;
+  width: 100%;
+  height: 44px;
   align-items: center;
   justify-content: space-between;
-  padding: 24px 0;
+  border-bottom: 1px solid #E9E9E9;
 }
 .paraChainProfiler .nav-left {
 }
 .paraChainProfiler .nav-left {
   display: flex;
+  align-items: center;
+  width: 100%;
 }
 .paraChainProfiler .nav-left .tab-item {
-  margin-right: 40px;
+  flex: 1;
   cursor: pointer;
   font-size: 16px;
   font-weight: bold;
   font-family: Rubik-Regular, Rubik;
-  color: rgba(41, 40, 40, 0.7);
+  color: #7F7E7E;
   line-height: 22px;
 }
 .paraChainProfiler .nav-left .tab-item.act,
 .paraChainProfiler .nav-left .tab-item:hover {
-  color: #17c684;
   position: relative;
+  color: #292828;
+  font-weight: bold;
 }
 .paraChainProfiler .nav-left .tab-item.act::after {
   position: absolute;
-  top: 30px;
-  width: 80%;
+  top: 32px;
+  width: 20px;
   content: "";
   display: inline-block;
   height: 2px;
-  left: 10%;
+  left: 50%;
+  margin-left: -10px;
   background: #17c684;
   border-radius: 2px;
 }

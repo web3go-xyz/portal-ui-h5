@@ -31,104 +31,38 @@
       </div>
       <div class="paraChainAnalytics-list">
         <h2 class="title">Top 10 Contributors</h2>
-        <div class="data-table">
-          <el-table
-            :key="Math.random()"
-            v-loading="loading"
-            element-loading-text="loading "
-            element-loading-spinner="el-icon-loading"
-            :data="tableData"
-            style="width: 100%"
-          >
-            <el-table-column label="Address" prop="crowdloanId">
-              <template slot-scope="scope">
-                <span class="copyImg" @click="copy(scope.row.account)">
-                  <el-tooltip content="copy" placement="top">
-                    <img :src="copyImg" alt="" class="copy" />
-                  </el-tooltip>
-                </span>
-                <span class="crowdloanId">
-                  {{ filterId(scope.row.account) }}
-                  <input
-                    v-model="scope.row.account"
-                    :copyId="scope.row.account"
-                  />
-                </span>
-              </template>
-            </el-table-column>
-
-            <el-table-column prop="crowdloanCount">
-              <template slot="header">
-                <el-tooltip
-                  content="Number of campaigns contributed"
-                  placement="top"
-                >
-                  <i class="el-icon-info">Number</i>
+        <ul class="topList">
+          <li v-for="(item, index) in tableData" :key="item.account">
+            <p class="account">
+              <span class="index" :class="'account' + (index + 1)">{{
+                index + 1
+              }}</span>
+              <span class="con">{{ item.account }}</span>
+              <span class="copyImg" @click="copy(item.account)">
+                <el-tooltip content="copy" placement="top">
+                  <img :src="copyImg" alt="" class="copy" />
                 </el-tooltip>
-              </template>
-              <template slot-scope="scope">
-                <span class="participations">
-                  {{ scope.row.crowdloanCount }}
-                </span>
-              </template>
-            </el-table-column>
-            <el-table-column label="Total DOT contributed" prop="Amount">
-              <template slot="header">
-                <el-tooltip content="Total DOT contributed" placement="top">
-                  <i class="el-icon-info">Total</i>
-                </el-tooltip>
-              </template>
-              <template slot-scope="scope">
-                <span class="amount">
-                  {{ formatedCap(scope.row.totalAmount) }}
-                </span>
-              </template>
-            </el-table-column>
-            <el-table-column
-              label="Max DOT contributed per campaign"
-              prop="Max"
-            >
-              <template slot="header">
-                <el-tooltip
-                  content="Max DOT contributed per campaign"
-                  placement="top"
-                >
-                  <i class="el-icon-info">Max</i>
-                </el-tooltip>
-              </template>
-              <template slot-scope="scope">
-                <span class="max">
-                  {{ formatedCap(scope.row.maxAmount) }}
-                </span>
-              </template>
-            </el-table-column>
-            <el-table-column
-              label="Min DOT contributed per campaign"
-              prop="Smallest"
-            >
-              <template slot="header">
-                <el-tooltip
-                  content="Min DOT contributed per campaign"
-                  placement="top"
-                >
-                  <i class="el-icon-info">Min</i>
-                </el-tooltip>
-              </template>
-              <template slot-scope="scope">
-                <span class="smallest">
-                  {{ formatedCap(scope.row.minAmount) }}
-                </span>
-              </template>
-            </el-table-column>
-            <el-table-column label="Number of contributions" prop="Total">
-              <template slot-scope="scope">
-                <span class="total">
-                  {{ scope.row.contributionCount }}
-                </span>
-              </template>
-            </el-table-column>
-          </el-table>
-        </div>
+              </span>
+              <input v-model="item.account" :copyId="item.account" />
+            </p>
+            <p>
+              <span>Number</span><span> {{ item.crowdloanCount }}</span>
+            </p>
+            <p>
+              <span>Total</span><span>{{ formatedCap(item.totalAmount) }}</span>
+            </p>
+            <p>
+              <span>Max</span><span> {{ formatedCap(item.maxAmount) }}</span>
+            </p>
+            <p>
+              <span>Min</span><span> {{ formatedCap(item.minAmount) }}</span>
+            </p>
+            <p>
+              <span>Number of contributions</span
+              ><span> {{ item.contributionCount }}</span>
+            </p>
+          </li>
+        </ul>
       </div>
     </div>
   </div>
@@ -146,7 +80,7 @@ export default {
       tokenRatio: 1000 * 1000 * 1000 * 1000,
       loading: true,
       tableData: [],
-      tabType: "DOT",
+      tabType: "DOT"
     };
   },
   mounted() {
@@ -164,11 +98,11 @@ export default {
       this.renderCategory(tokenData, "DOT");
     },
     getContributorsData() {
-      service.getContributorCompareOfMultiRound().then((res) => {
+      service.getContributorCompareOfMultiRound().then(res => {
         this.renderCategory(res, "Contributors");
         this.renderLine(res, "Contributors");
       });
-      service.getTopContributorOfMultiRound().then((res) => {
+      service.getTopContributorOfMultiRound().then(res => {
         this.loading = false;
         this.dealtableData(res);
       });
@@ -193,50 +127,50 @@ export default {
         title: {
           left: -5,
           textStyle: {
-            color: "#292828",
-          },
+            color: "#292828"
+          }
         },
         tooltip: {
           trigger: "axis",
           axisPointer: {
-            type: "shadow",
-          },
+            type: "shadow"
+          }
         },
         xAxis: {
           data: data.map((item, index) => `Round ${index + 1}`),
           axisLine: {
-            show: false,
+            show: false
           },
           axisTick: {
-            show: false,
+            show: false
           },
           axisLabel: {
-            color: "rgba(41, 40, 40, 0.4)",
-          },
+            color: "rgba(41, 40, 40, 0.4)"
+          }
         },
         yAxis: {
           axisLabel: {
-            color: "rgba(41, 40, 40, 0.4)",
+            color: "rgba(41, 40, 40, 0.4)"
           },
           splitLine: {
             show: true,
             lineStyle: {
               type: "dashed",
-              color: "rgba(41, 40, 40, 0.4)",
-            },
-          },
+              color: "rgba(41, 40, 40, 0.4)"
+            }
+          }
         },
         series: [
           {
             name: "Contributors",
             type: "line",
-            data: data.map((item) =>
+            data: data.map(item =>
               type === "DOT"
                 ? this.formatedCap(item.totalRaised, true)
                 : item.totalContributorCount
             ),
             itemStyle: {
-              color: "#17c684",
+              color: "#17c684"
             },
             areaStyle: {
               color: {
@@ -248,21 +182,21 @@ export default {
                 colorStops: [
                   {
                     offset: 0,
-                    color: "rgba(105, 231, 201, 0.35)", // 0% 处的颜色
+                    color: "rgba(105, 231, 201, 0.35)" // 0% 处的颜色
                   },
                   {
                     offset: 1,
-                    color: "rgba(56, 203, 152, 0)", // 100% 处的颜色
-                  },
-                ],
-              },
-            },
-          },
-        ],
+                    color: "rgba(56, 203, 152, 0)" // 100% 处的颜色
+                  }
+                ]
+              }
+            }
+          }
+        ]
       };
       if (type === "DOT") {
         option.series[0].name = "DOT";
-        option.tooltip.formatter = function (params) {
+        option.tooltip.formatter = function(params) {
           var tar = params[0];
           return (
             '<div class="option-rasie"><div class="option-rasie-title">' +
@@ -281,12 +215,12 @@ export default {
         tooltip: {
           trigger: "axis",
           axisPointer: {
-            type: "shadow",
-          },
+            type: "shadow"
+          }
         },
         legend: {
           left: "right",
-          data: ["Maximum amount", "Average amount", "Minimum amount"],
+          data: ["Maximum amount", "Average amount", "Minimum amount"]
         },
         toolbox: {
           show: true,
@@ -298,20 +232,20 @@ export default {
             dataView: { show: true, readOnly: false },
             magicType: { show: true, type: ["line", "bar", "stack"] },
             restore: { show: true },
-            saveAsImage: { show: true },
-          },
+            saveAsImage: { show: true }
+          }
         },
         xAxis: [
           {
             type: "category",
             axisTick: { show: false },
-            data: data.map((item, index) => `Round ${index + 1}`),
-          },
+            data: data.map((item, index) => `Round ${index + 1}`)
+          }
         ],
         yAxis: [
           {
-            type: "value",
-          },
+            type: "value"
+          }
         ],
         series: [
           {
@@ -319,52 +253,52 @@ export default {
             type: "bar",
             barGap: 0,
             emphasis: {
-              focus: "series",
+              focus: "series"
             },
-            data: data.map((item) =>
+            data: data.map(item =>
               type === "DOT"
                 ? this.formatedCap(item.maxRaised, true)
                 : item.maxContributorCount
-            ),
+            )
           },
           {
             name: "Average amount",
             type: "bar",
             emphasis: {
-              focus: "series",
+              focus: "series"
             },
-            data: data.map((item) =>
+            data: data.map(item =>
               type === "DOT"
                 ? this.formatedCap(item.avgRaised, true)
                 : item.avgContributorCount
-            ),
+            )
           },
           {
             name: "Minimum amount",
             type: "bar",
             emphasis: {
-              focus: "series",
+              focus: "series"
             },
-            data: data.map((item) =>
+            data: data.map(item =>
               type === "DOT"
                 ? this.formatedCap(item.minRaised, true)
                 : item.minContributorCount
-            ),
-          },
-        ],
+            )
+          }
+        ]
       };
       if (type === "DOT") {
         option.legend.data = [
           "Maximum number of contributors",
           "Average number of contributors",
-          "Minimum number of contributors",
+          "Minimum number of contributors"
         ];
         option.series[0].name = "Maximum number of contributors";
         option.series[1].name = "Average number of contributors";
         option.series[2].name = "Minimum number of contributors";
         option.tooltip = {
           trigger: "axis",
-          formatter: function (params) {
+          formatter: function(params) {
             var tar1 = params[0];
             var tar2 = params[1];
             var tar3 = params[2];
@@ -379,20 +313,20 @@ export default {
               tar3.data +
               "K</span></div></div>"
             );
-          },
+          }
         };
       } else {
         option.legend.data = [
           "Maximum amount",
           "Average amount",
-          "Minimum amount",
+          "Minimum amount"
         ];
         option.series[0].name = "Maximum amount";
         option.series[1].name = "Average amount";
         option.series[2].name = "Minimum amount";
         option.tooltip = {
           trigger: "axis",
-          formatter: function (params) {
+          formatter: function(params) {
             var tar1 = params[0];
             var tar2 = params[1];
             var tar3 = params[2];
@@ -407,18 +341,92 @@ export default {
               tar3.data +
               "</span></div></div>"
             );
-          },
+          }
         };
       }
       const category = echarts.init(this.$refs[`${type}-category`]);
       category.setOption(option);
-    },
-  },
+    }
+  }
 };
 </script>
 
-<style  lang='less' scoped>
+<style lang="less" scoped>
 .paraChainAnalytics {
+  padding: 16px;
+  .topList {
+    background: #fff;
+    border-radius: 10px;
+    padding: 16px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    li {
+      color: #7f7e7e;
+      font-size: 14px;
+
+      p {
+        padding-left: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        line-height: 22px;
+        padding-bottom: 8px;
+        span {
+          text-align: left;
+          flex: 1;
+        }
+        span:last-child {
+          text-align: right;
+        }
+        &.account {
+          position: relative;
+          color: #292828;
+          align-items: flex-start;
+          .con {
+            flex: none;
+            word-break: break-all;
+            width: 213px;
+          }
+          .copyImg {
+            text-align: right;
+            margin-right: -35px;
+          }
+          input {
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            border: none;
+            outline: none;
+          }
+          .index {
+            position: absolute;
+            left: -5px;
+            font-weight: bold;
+            top: 0;
+            text-align: center;
+            line-height: 20px;
+            border-radius: 50%;
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            &.account1 {
+              color: #f8c057;
+              background: rgba(248, 192, 87, 0.3);
+            }
+            &.account2 {
+              color: #75869e;
+              background: rgba(76, 95, 122, 0.2);
+            }
+          }
+        }
+      }
+      &:not(:last-child) {
+        padding-bottom: 16px;
+        border-bottom: 1px dashed rgba(41, 40, 40, 0.3);
+      }
+    }
+  }
   .crowdloanId {
     input {
       width: 1px;
@@ -459,31 +467,33 @@ export default {
     content: "Copy";
   }
   &-nav {
+    border-radius: 16px;
     text-align: left;
     margin-top: 8px;
     clear: both;
-    overflow: hidden;
+    display: flex;
+    align-items: center;
+    height: 44px;
+    background: #fff;
+    padding: 5px;
     span {
-      float: left;
-      display: inline-block;
+      flex: 1;
+      border-radius: 12px;
       text-align: center;
-      line-height: 32px;
-      width: 104px;
-      height: 32px;
       background: #ffffff;
-      border: 1px solid #d9d9d9;
-      border-radius: 6px 0px 0px 6px;
+      height: 34px;
+      line-height: 34px;
       font-size: 14px;
       font-family: Rubik-Regular, Rubik;
       font-weight: 400;
-      color: #595959;
+      color: #7f7e7e;
       cursor: pointer;
       &:last-child {
         border-radius: 0px 6px 6px 0px;
       }
       &.act {
-        color: #38cb98;
-        border: 1px solid #38cb98;
+        color: #fff;
+        background: linear-gradient(180deg, #55e4c1 0%, #30c793 100%);
       }
     }
   }
@@ -494,15 +504,16 @@ export default {
     background: #fff;
     height: 428px;
     position: relative;
+    border-radius: 10px;
     .title {
       margin: 0;
       padding: 0;
-      top: 24px;
+      top: 8px;
       left: 24px;
       position: absolute;
       text-align: left;
       line-height: 32px;
-      font-size: 24px;
+      font-size: 14px;
       font-family: Rubik-Medium, Rubik;
       font-weight: 500;
       color: rgba(41, 40, 40, 0.8);
@@ -513,7 +524,8 @@ export default {
     }
   }
   &-category {
-    padding: 24px;
+    padding: 40px 24px 24px;
+    border-radius: 10px;
     box-sizing: border-box;
     margin-top: 32px;
     background: #fff;
@@ -522,12 +534,12 @@ export default {
     .title {
       margin: 0;
       padding: 0;
-      top: 24px;
+      top: 8px;
       left: 24px;
       position: absolute;
       text-align: left;
       line-height: 32px;
-      font-size: 24px;
+      font-size: 14px;
       font-family: Rubik-Medium, Rubik;
       font-weight: 500;
       color: rgba(41, 40, 40, 0.8);
@@ -540,17 +552,17 @@ export default {
 
   &-list {
     margin-top: 21px;
-    padding: 24px;
+    padding: 16px;
+    border-radius: 10px;
     background: #fff;
     .title {
       margin: 0;
-      padding: 0 24px;
       text-align: left;
       line-height: 32px;
-      font-size: 24px;
+      font-size: 14px;
       font-family: Rubik-Medium, Rubik;
       font-weight: 500;
-      color: rgba(41, 40, 40, 0.8);
+      color: #545353;
     }
     div {
       /deep/ th:nth-child(3) .cell,
@@ -608,7 +620,7 @@ export default {
   }
 }
 </style>
-<style  lang='less'>
+<style lang="less">
 .option-rasie {
   &-title {
     text-align: center;

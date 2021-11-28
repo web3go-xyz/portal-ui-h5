@@ -4,7 +4,7 @@
     class="main-container"
     :class="{ 'no-head': $route.meta.noHead }"
   >
-    <div class="head">
+    <div class="head" v-if="$route.name ==='HomePage'">
       <div class="logo" @click="goHome">
         <a href="/">
           <img :src="logoImg" alt="" />
@@ -358,6 +358,8 @@ body.white-theme {
     background-color: #111111;
   }
   .g-wrap {
+    width: 100%;
+    overflow: auto;
     margin: 0 auto;
   }
   /* 表格边框 */

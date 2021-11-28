@@ -31,7 +31,12 @@
       </div>
       <div class="paraChainAnalytics-list">
         <h2 class="title">Top 10 Contributors</h2>
-        <ul class="topList">
+        <ul
+          class="topList"
+          v-loading="loading"
+          element-loading-text="loading "
+          element-loading-spinner="el-icon-loading"
+        >
           <li v-for="(item, index) in tableData" :key="item.account">
             <p class="account">
               <span class="index" :class="'account' + (index + 1)">{{

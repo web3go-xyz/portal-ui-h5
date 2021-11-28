@@ -927,7 +927,7 @@ export default {
 
 .choose-history-block {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
 }
 .choose-history-block .el-select {
   width: 300px;

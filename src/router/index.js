@@ -118,6 +118,9 @@ export default new Router({
         {
             path: '/ParaChainProfiler4Polkadot',
             name: 'ParaChainProfiler4Polkadot',
+            meta: {
+                noHead: true
+            },
             component: ParaChainProfiler4Polkadot
         },
         {

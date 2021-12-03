@@ -136,6 +136,9 @@ export default new Router({
         {
             path: '/CDPProfiler',
             name: 'CDPProfiler',
+            meta: {
+                noHead: true
+            },
             component: CDPProfiler
         },
 

@@ -258,7 +258,7 @@ body.white-theme {
       position: absolute;
       top: 45px;
       z-index: 999;
-      border-top: solid 1px #eee;
+      // border-top: solid 1px #eee;
       .menu-item {
         padding: 10px 24px;
         height: 24px;

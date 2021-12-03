@@ -4,7 +4,7 @@
     class="main-container"
     :class="{ 'no-head': $route.meta.noHead }"
   >
-    <div class="head" v-if="$route.meta.noHead">
+    <div class="head" v-if="!$route.meta.noHead">
       <div class="logo" @click="goHome">
         <a href="/">
           <img :src="logoImg" alt="" />

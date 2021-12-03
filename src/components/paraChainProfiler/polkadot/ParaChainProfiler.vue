@@ -1,5 +1,5 @@
 <template>
-  <div class="content paraChainProfiler">
+  <div class="content paraChainProfiler" :class="isClientX ? 'isClientX' : ''">
     <div class="common-back-title">
       <div class="g-wrap">
         <i class="el-icon-back" @click="$router.back()"></i>
@@ -45,6 +45,12 @@
     </div>
     <div class="g-wrap">
       <div class="data-table" v-if="tabType === 'On-going'">
+        <img
+          src="../../../assets/images/enlarge.png"
+          alt=""
+          class="enlarge"
+          @click="clickEnlarge()"
+        />
         <div class="choose-history-block"></div>
         <el-table
           id="to-img-div"
@@ -341,6 +347,14 @@ export default {
     }
   },
   methods: {
+    clickEnlarge() {
+      // const h = document.body.clientHeight;
+      // const w = document.body.clientWidth;
+      // this.isClientX = !this.isClientX;
+      // document.body.setAttribute("style", "transform: rotate(90deg)");
+      // document.body.style.width = h + "px";
+      // document.body.style.height = w + "px";
+    },
     handleShare(key) {
       this.showTableColumn = false;
       this.$nextTick(() => {
@@ -611,6 +625,14 @@ export default {
 </script>
 <style lang="less">
 .paraChainProfiler {
+  .enlarge {
+    z-index: 1;
+    position: absolute;
+    right: 0;
+    width: 16px;
+    height: 16px;
+    top: 15px;
+  }
   .back {
     widows: 100%;
     height: 60px;
@@ -828,7 +850,9 @@ export default {
   font-size: 1.5rem;
   margin-right: 10px;
 }
-
+.data-table {
+  position: relative;
+}
 .data-table.min-height {
   min-height: 700px;
   display: flex;

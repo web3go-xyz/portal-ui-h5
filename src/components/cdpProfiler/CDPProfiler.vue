@@ -65,7 +65,7 @@
       v-infinite-scroll="load"
       :infinite-scroll-disabled="disabled"
     >
-      <div class="item" v-for="d in loanPositionTableData" :key="d.accountId">
+      <div class="item"  @click="showLoanPositionDetail(d)" v-for="d in loanPositionTableData" :key="d.accountId">
         <div class="head">
           <div class="h-left">
             <img

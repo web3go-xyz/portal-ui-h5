@@ -74,7 +74,7 @@
 
 <script>
 import Password from "vue-password-strength-meter";
-import { signin, signup } from "@/api/user";
+import { signin, signup, getUserInfo } from "@/api/user";
 
 export default {
   components: { Password },
@@ -131,14 +131,23 @@ export default {
                 "userInfo",
                 JSON.stringify({
                   token: res.token,
-                  username: res.username,
-                  name: res.displayName,
-                  email: res.email,
-                  avatar: res.imageBase64,
-                  userId: res.userId,
                 })
               );
-              this.$router.push("/");
+              getUserInfo().then((d) => {
+                const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+                localStorage.setItem(
+                  "userInfo",
+                  JSON.stringify({
+                    ...userInfo,
+                    username: d.loginName,
+                    name: d.displayName,
+                    email: d.email,
+                    avatar: d.imageBase64,
+                    userId: d.userId,
+                  })
+                );
+                this.$router.push("/");
+              });
             });
           });
         }

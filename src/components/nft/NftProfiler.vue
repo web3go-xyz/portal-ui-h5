@@ -101,6 +101,7 @@
 import {
   getCollectionStatistic,
   getTopTradedCollections,
+  getAvgPriceVolumeOfCollection,
   getTotalCollectionVolumes
 } from "@/api/nftProfiler";
 import { formatKUSAMA } from "../../filters";
@@ -115,6 +116,7 @@ export default {
       },
       listData: [],
       totalCount: 0,
+      latest7days: [],
       collectionVolume: "--",
       nftNavConListLoading: false,
       nftNavConTopLoading: false,
@@ -164,6 +166,17 @@ export default {
       ]
     };
   },
+  created() {
+    const arr = [];
+    for (let i = 6; i >= 0; i--) {
+      arr.push(
+        this.$moment()
+          .subtract(i, "days")
+          .format("YYYY-MM-DD")
+      );
+    }
+    this.latest7days = arr;
+  },
   mounted() {
     this.init();
   },
@@ -207,71 +220,86 @@ export default {
     getTopTradedCollections() {
       this.nftNavConTopLoading = true;
       getTopTradedCollections({
-        start_time: "2021-03-28 15:37:00",
-        end_time: "2021-12-9 00:00:00",
+        start_time: "2020-03-01",
+        end_time: this.$moment().format("YYYY-MM-DD"),
         interaction: "BUY",
         topN: 5
-      }).then(res => {
-        this.nftNavConTopLoading = false;
-        const chartDom = document.getElementById("nftNavConTop-line");
-        const myChart = echarts.init(chartDom);
-        const option = {
-          tooltip: {
-            showContent: true
-          },
-          legend: {
-            left: "5%"
-          },
-          dataset: {
-            source: [
-              ["product", "2021"],
-              ["Milk Tea", 56.5],
-              ["Matcha Latte", 51.1],
-              ["Cheese Cocoa", 40.1],
-              ["Walnut Brownie", 25.2]
-            ]
-          },
-          xAxis: { type: "category" },
-          yAxis: { gridIndex: 0 },
-          series: [
-            {
-              type: "line",
-              smooth: true,
-              seriesLayoutBy: "row",
-              emphasis: { focus: "series" }
-            },
-            {
-              type: "line",
-              smooth: true,
-              seriesLayoutBy: "row",
-              emphasis: { focus: "series" }
-            },
-            {
-              type: "line",
-              smooth: true,
-              seriesLayoutBy: "row",
-              emphasis: { focus: "series" }
-            },
-            {
-              type: "line",
-              smooth: true,
-              seriesLayoutBy: "row",
-              emphasis: { focus: "series" }
+      }).then(getTopTradedCollectionsRes => {
+        if (getTopTradedCollectionsRes.length) {
+          Promise.all(
+            getTopTradedCollectionsRes.map(item => {
+              return getAvgPriceVolumeOfCollection({
+                collection_id: item.collection_id,
+                query_days: this.latest7days
+              });
+            })
+          ).then(getAvgPriceVolumeOfCollectionRes => {
+            this.nftNavConTopLoading = false;
+            const chartDom = document.getElementById("nftNavConTop-line");
+            const myChart = echarts.init(chartDom);
+            const option = {
+              tooltip: {
+                showContent: true
+              },
+              legend: {
+                left: "5%"
+              },
+              dataset: {
+                source: [
+                  ["product", "2021"],
+                  ["Milk Tea", 56.5],
+                  ["Matcha Latte", 51.1],
+                  ["Cheese Cocoa", 40.1],
+                  ["Walnut Brownie", 25.2]
+                ]
+              },
+              xAxis: { type: "category" },
+              yAxis: { gridIndex: 0 },
+              series: [
+                {
+                  type: "line",
+                  smooth: true,
+                  seriesLayoutBy: "row",
+                  emphasis: { focus: "series" }
+                },
+                {
+                  type: "line",
+                  smooth: true,
+                  seriesLayoutBy: "row",
+                  emphasis: { focus: "series" }
+                },
+                {
+                  type: "line",
+                  smooth: true,
+                  seriesLayoutBy: "row",
+                  emphasis: { focus: "series" }
+                },
+                {
+                  type: "line",
+                  smooth: true,
+                  seriesLayoutBy: "row",
+                  emphasis: { focus: "series" }
+                }
+              ]
+            };
+            const source = [];
+            const time = getAvgPriceVolumeOfCollectionRes[0].map(
+              item => item.timestamp_byday
+            );
+            source.push(["product", ...time]);
+            for (let i = 0; i < getTopTradedCollectionsRes.length; i++) {
+              const collection_id = getTopTradedCollectionsRes[
+                i
+              ].collection_id.split("-")[1];
+              const volume = getAvgPriceVolumeOfCollectionRes[i].map(
+                item => +formatKUSAMA(item.volume).replaceAll(",", "")
+              );
+              source.push([collection_id, ...volume]);
             }
-          ]
-        };
-        const source = [];
-        source.push(["product", "2021"]);
-        for (let i = 0; i < res.length; i++) {
-          const collection_id = res[i].collection_id.split("-")[1];
-          const traded_volume = +formatKUSAMA(res[i].traded_volume).replaceAll(
-            ",",
-            ""
-          );
-          source.push([collection_id, traded_volume]);
+            option.dataset.source = source;
+            myChart.setOption(option);
+          });
         }
-        option.dataset.source = source;
-        myChart.setOption(option);
       });
     },
     filterTimestamp_created_at(str) {

@@ -220,7 +220,9 @@ export default {
     getTopTradedCollections() {
       this.nftNavConTopLoading = true;
       getTopTradedCollections({
-        start_time: "2020-03-01",
+        start_time: this.$moment()
+          .subtract(7, "days")
+          .format("YYYY-MM-DD"),
         end_time: this.$moment().format("YYYY-MM-DD"),
         interaction: "BUY",
         topN: 5

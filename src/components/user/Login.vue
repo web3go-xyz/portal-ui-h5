@@ -108,7 +108,7 @@ export default {
             );
             localStorage.setItem(
                 "tokenExpireTime",
-                this.$moment().add(1, "days")
+                this.$moment().add(7, "days")
               );
             getUserInfo().then((d) => {
               const userInfo = JSON.parse(localStorage.getItem("userInfo"));

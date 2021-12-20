@@ -1,140 +1,105 @@
 <template>
-  <div class="content cdp-page">
-    <div
-      v-show="ifWhiteTheme"
-      class="common-back-title"
-      style="margin-left: -100px; margin-right: -100px"
-    >
-      <i class="el-icon-back" @click="$router.back()"></i>
+  <div class="m-cdp-page">
+    <div class="mobile-back-title">
+      <img
+        class="back"
+        @click="$router.back()"
+        src="@/assets/images/back.png"
+        alt=""
+      />
       <span class="text">Karura</span>
     </div>
-    <div class="search-filter">
-      <div class="chainStatistic">
-        <div>
-          <div class="statistic-item clearfix">
-            <div class="icon icon-total"></div>
-            <div class="value">
-              <div class="title">Total</div>
-              <div class="value-formated">
-                {{ statisticData.collateralFormat
-                }}<span class="value-formated-unit">CDPS</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="statistic-item clearfix">
-            <div class="icon icon-debt"></div>
-            <div class="value">
-              <div class="title">Debt</div>
-              <div class="value-formated">
-                {{ statisticData.debitFormat }}
-                <span class="value-formated-unit">KUSD</span>
-              </div>
-            </div>
-          </div>
+    <div class="info-wrap">
+      <div class="item">
+        <div class="top">
+          <img src="@/assets/images/karura/icon1.png" alt="" />
+          <span class="text1">Total</span>
+          <span class="text2">(CDPs)</span>
         </div>
+        <div class="bottom">{{ statisticData.collateralFormat }}</div>
       </div>
-      <div>
+      <div class="item">
+        <div class="top">
+          <img src="@/assets/images/karura/icon2.png" alt="" />
+          <span class="text1">Debt</span>
+          <span class="text2">(KUSD)</span>
+        </div>
+        <div class="bottom">{{ statisticData.debitFormat }}</div>
+      </div>
+    </div>
+    <div class="search-wrap">
+      <div class="key-search-wrap">
         <el-input
           clearable
-          class="cdp-search-filter-input"
+          class="key-search"
           prefix-icon="el-icon-search"
           placeholder="Enter User Address"
           type="text"
           v-model="query.accountId"
-          @keyup.enter.native="searchLoanPositionByAccountId"
+          @change="searchLoanPositionByAccountId"
         ></el-input>
       </div>
-    </div>
-    <div class="clear"></div>
-    <div class="filter">
-      <el-select
-        @change="loadLoanPositionTable"
-        v-model="query.filterStatus"
-        multiple
-        collapse-tags
-        style="margin-left: 20px"
-        placeholder="filter status"
-      >
-        <el-option
-          v-for="item in statusOptions"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value"
-        >
-        </el-option>
-      </el-select>
-      <el-checkbox
-        @change="loadLoanPositionTable"
-        v-model="query.hideLoanCompleted"
-        >Hide Loan Completed</el-checkbox
-      >
-    </div>
-    <div class="cdp-list">
-      <div class="cdp-list-header">
-        <el-row>
-          <el-col :span="10" align="left">ID</el-col>
-          <el-col :span="3">Debt</el-col>
-          <el-col :span="3">Collateral</el-col>
-          <el-col :span="3">Ratio</el-col>
-          <el-col :span="2">Status</el-col>
-        </el-row>
-      </div>
-      <div class="cdp-list-content">
-        <div
-          class="lp-row"
-          v-for="d in loanPositionTableData"
-          :key="d.accountId"
-        >
-          <el-row>
-            <el-col :span="10" align="left">
-              <div class="accountId">
-                <img
-                  class="account-logo"
-                  src="./../../assets/images/kusama-logo.png"
-                />
-                {{ d.accountId | shorterAddress }}
-              </div>
-            </el-col>
-            <el-col :span="4"
-              ><div class="debt">{{ d.debitFormat }} KUSD</div></el-col
-            >
-            <el-col :span="3"
-              ><div class="collateral">
-                {{ d.collateralFormat }} KSM
-              </div></el-col
-            >
-            <el-col :span="3"
-              ><div class="ratio" :class="getShowColor(d)">
-                {{ d.ratioPercentage }} %
-              </div></el-col
-            >
-            <el-col :span="2"
-              ><div class="status" :class="getShowColor(d)">
-                {{ d.status }}
-              </div></el-col
-            >
-            <el-col :span="2"
-              ><div class="view" @click="showLoanPositionDetail(d)">
-                view &nbsp;<i class="el-icon-right"></i></div
-            ></el-col>
-          </el-row>
+      <div class="other-search">
+        <div class="o-left">
+          <div
+            v-for="item in statusOptions"
+            :key="item.value"
+            class="item"
+            :class="{ active: query.filterStatus.includes(item.value) }"
+            @click="clickItem(item)"
+          >
+            <span>{{ item.label }}</span>
+          </div>
+        </div>
+        <div class="o-right">
+          <el-checkbox
+            @change="changeCheckbox"
+            v-model="query.hideLoanCompleted"
+            >Hide Loan Completed</el-checkbox
+          >
         </div>
       </div>
-      <div class="cdp-list-pagination">
-        <el-pagination
-          background
-          layout="prev, pager, next,sizes,jumper"
-          :current-page.sync="query.pageIndex"
-          :page-size.sync="query.pageSize"
-          :page-sizes="[10, 20, 50, 100]"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          :total="totalCount"
-        >
-        </el-pagination>
+    </div>
+    <div
+      class="card-list"
+      v-infinite-scroll="load"
+      :infinite-scroll-disabled="disabled"
+    >
+      <div class="item"  @click="showLoanPositionDetail(d)" v-for="d in loanPositionTableData" :key="d.accountId">
+        <div class="head">
+          <div class="h-left">
+            <img
+              class="logo"
+              src="./../../assets/images/wallet-login-icon-bak.png"
+            />
+            <span class="text">
+              {{ d.accountId | shorterAddress }}
+            </span>
+          </div>
+          <img class="arrow" src="@/assets/images/karura/arrow.png" />
+        </div>
+        <div class="ul">
+          <div class="li">
+            <span class="label">Debt</span>
+            <span>{{ d.debitFormat }} KUSD</span>
+          </div>
+          <div class="li">
+            <span class="label">Collateral</span>
+            <span>{{ d.collateralFormat }} KSM</span>
+          </div>
+          <div class="li">
+            <span class="label">Ratio</span>
+            <span :class="getShowColor(d)">{{ d.ratioPercentage }} %</span>
+          </div>
+          <div class="li">
+            <span class="label">Status</span>
+            <span :class="getShowColor(d)">{{ d.status }}</span>
+          </div>
+        </div>
       </div>
     </div>
+    <div v-if="loading" class="footer">loading...</div>
+    <div v-if="noMore" class="footer">no more</div>
   </div>
 </template>
 
@@ -166,7 +131,14 @@ export default {
       loanPositionTableData: [],
     };
   },
-  computed: {},
+  computed: {
+    noMore() {
+      return this.loanPositionTableData.length >= this.totalCount;
+    },
+    disabled() {
+      return this.loading || this.noMore;
+    },
+  },
   mounted() {
     const bodyEl = document.querySelector("body");
     if (bodyEl.className.includes("white-theme")) {
@@ -182,6 +154,26 @@ export default {
     self.loadLoanPositionTable();
   },
   methods: {
+    changeCheckbox() {
+      this.loanPositionTableData = [];
+      this.loadLoanPositionTable();
+    },
+    load() {
+      this.$set(this.query, "pageIndex", this.query.pageIndex + 1);
+      this.loadLoanPositionTable();
+    },
+    clickItem(item) {
+      const findIndex = this.query.filterStatus.findIndex(
+        (v) => v == item.value
+      );
+      if (findIndex !== -1) {
+        this.query.filterStatus.splice(findIndex, 1);
+      } else {
+        this.query.filterStatus.push(item.value);
+      }
+      this.loanPositionTableData = [];
+      this.loadLoanPositionTable();
+    },
     handleSizeChange(val) {
       console.log(`每页 ${val} 条`);
       this.loadLoanPositionTable();
@@ -229,10 +221,13 @@ export default {
           accountId: "",
         })
         .then((resp) => {
-          self.loanPositionTableData = [];
+          // self.loanPositionTableData = [];
           self.loading = false;
           if (resp && resp.list.length > 0) {
-            self.loanPositionTableData = resp.list;
+            self.loanPositionTableData = [
+              ...self.loanPositionTableData,
+              ...resp.list,
+            ];
             self.totalCount = resp.totalCount;
           } else {
             self.totalCount = 0;
@@ -303,86 +298,156 @@ export default {
 </script>
  
 <style lang="less" scoped>
-.cdp-page {
-  .search-filter {
-    margin-top: 0;
-  }
-  .chainStatistic {
-    padding-top: 20px;
-    padding-bottom: 16px;
-  }
-  .statistic-item {
-    display: inline-block;
-  }
-  .statistic-item:last-child {
-    margin-left: 40px;
-  }
-
-  .statistic-item .icon {
-    float: left;
-    width: 48px;
-    height: 48px;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    margin: 10px 16px;
-  }
-  .icon-total {
-    background: url("./../../assets/images/cdp-total.png");
-  }
-  .icon-debt {
-    background: url("./../../assets/images/cdp-debt.png");
-  }
-  .statistic-item .value {
-    float: left;
-  }
-  .statistic-item .value .title {
-    float: initial;
-    text-align: left;
-    font-size: 16px;
-    color: rgba(255, 255, 255, 0.45);
-  }
-  .statistic-item .value .value-formated {
-    float: initial;
-    font-size: 32px;
-    color: rgba(255, 255, 255, 0.87);
-    margin-top: 10px;
-  }
-  .statistic-item .value .value-formated .value-formated-unit {
-    font-size: 16px;
-    color: #858585;
-    margin-left: 20px;
-  }
-
-  .filter {
-    padding: 15px 0;
+.m-cdp-page {
+  .info-wrap {
     display: flex;
-    justify-content: flex-end;
-    align-items: center;
+    padding: 16px;
+    padding-bottom: 0;
+    .item {
+      text-align: left;
+      padding: 16px;
+      flex: 1;
+      background: white;
+      border-radius: 10px;
+      &:last-child {
+        margin-left: 16px;
+      }
+      .top {
+        display: flex;
+        align-items: center;
+        img {
+          width: 24px;
+          height: 24px;
+          margin-right: 8px;
+        }
+        .text1 {
+          font-size: 16px;
+          color: #7f7e7e;
+        }
+        .text2 {
+          margin-left: 4px;
+          font-size: 12px;
+          color: #7f7e7e;
+        }
+      }
+      .bottom {
+        margin-top: 8px;
+        font-size: 16px;
+        color: #292828;
+      }
+    }
   }
-  .filter .el-checkbox {
-    margin-left: 15px;
-    color: rgba(255, 255, 255, 0.45) !important;
+  .key-search-wrap {
+    padding: 0 16px;
+    .key-search {
+      /deep/ .el-input__inner {
+        border-radius: 10px;
+        border: 0 !important;
+        height: 44px;
+        line-height: 44px;
+        padding-left: 35px;
+      }
+      /deep/ .el-icon-search::before {
+        display: inline-block;
+        content: "";
+        width: 16px;
+        height: 16px;
+        background-image: url(~@/assets/images/karura/search-icon.png);
+        background-size: contain;
+        background-position: center;
+      }
+      /deep/ .el-input__icon {
+        line-height: 50px;
+      }
+    }
+  }
+  .other-search {
+    text-align: left;
+    padding: 16px;
+    .o-left {
+      display: flex;
+      .item {
+        margin-right: 8px;
+        background: rgba(41, 40, 40, 0.05);
+        border-radius: 4px;
+        font-size: 14px;
+        color: #7f7e7e;
+        padding: 5px 8px;
+        &.active {
+          background: rgb(226, 240, 236);
+          color: rgb(90, 205, 155);
+        }
+      }
+    }
+    .o-right {
+      margin-top: 8px;
+    }
+  }
+  .card-list {
+    padding: 16px;
+    .item {
+      background: #ffffff;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      padding: 16px;
+      .head {
+        display: flex;
+        justify-content: space-between;
+        .h-left {
+          display: flex;
+          align-items: center;
+          .logo {
+            width: 24px;
+            height: 24px;
+            margin-right: 8px;
+          }
+          .text {
+            font-size: 16px;
+            font-weight: bold;
+            color: #292828;
+          }
+        }
+        .arrow {
+          width: 16px;
+          height: 16px;
+        }
+      }
+      .ul {
+        .li {
+          padding: 4px 0;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-size: 14px;
+          color: #545353;
+          .label {
+            font-size: 14px;
+            color: #7f7e7e;
+          }
+        }
+      }
+    }
   }
 }
-body.white-theme .cdp-page {
-  .icon-total {
-    background-image: url("./../../assets/images/cdp-total2.png");
-  }
-  .icon-debt {
-    background-image: url("./../../assets/images/cdp-debt2.png");
-  }
-  .statistic-item .value .title {
-    color: rgba(41, 40, 40, 0.6);
-  }
-  .statistic-item .value .value-formated {
-    color: rgba(41, 40, 40, 1);
-  }
-  .statistic-item .value .value-formated .value-formated-unit {
-    color: rgba(41, 40, 40, 0.6);
-  }
-  .filter .el-checkbox {
-    color: #606266 !important;
-  }
+.Safe {
+  color: #17c684;
+}
+.footer {
+  font-size: 16px;
+  color: #7f7e7e;
+  padding-bottom: 16px;
+}
+.Warning {
+  color: #ffad00;
+}
+
+.Danger {
+  color: #ea3943;
+}
+.search-wrap {
+  padding-top: 16px;
+  background-color: #f5f7f9;
+  position: sticky;
+  top: 44px;
 }
 </style>

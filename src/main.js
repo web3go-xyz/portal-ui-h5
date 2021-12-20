@@ -16,7 +16,7 @@ import './style/whiteTheme.less';
 import App from './App'
 import router from './router'
 import store from './store'
- 
+
 import * as filters from './filters' // global filters
 import * as utils from './utils';
 import moment from 'moment';
@@ -31,11 +31,15 @@ Object.keys(filters).forEach(key => {
 
 Vue.config.productionTip = false
 
-
+// token若过期就清掉
+const tokenExpireTime = localStorage.getItem('tokenExpireTime');
+if (!tokenExpireTime || moment().valueOf() > moment(tokenExpireTime).valueOf()) {
+    localStorage.removeItem("userInfo");
+}
 /* eslint-disable no-new */
 new Vue({
     el: '#app',
     router,
-    store, 
+    store,
     render: h => h(App)
 })

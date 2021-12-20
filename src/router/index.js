@@ -5,6 +5,7 @@ import Login from '@/components/user/Login'
 import Register from '@/components/user/Register'
 import UserInfo from '@/components/user/UserInfo'
 import VerifyEmail from '@/components/user/VerifyEmail'
+import NftProfiler from "@/components/nft/NftProfiler";
 import VerifyCode from '@/components/user/VerifyCode'
 import ResetPsd from '@/components/user/ResetPsd'
 
@@ -42,6 +43,11 @@ export default new Router({
             path: '/NotReady',
             name: 'NotReady',
             component: NotReady
+        },
+        {
+            path: "/NftProfiler",
+            name: "NftProfiler",
+            component: NftProfiler
         },
         {
             path: '/Login',
@@ -136,6 +142,9 @@ export default new Router({
         {
             path: '/CDPProfiler',
             name: 'CDPProfiler',
+            meta: {
+                noHead: true
+            },
             component: CDPProfiler
         },
 

@@ -1,218 +1,139 @@
 <template>
-  <div class="content cdp-detail-page cdp-page">
-    <div v-show="!ifWhiteTheme" class="search-filter">
-      <div class="head-back" @click="$router.back()">
-        <span><i class="el-icon-back"></i>Back</span>
-      </div>
-      <div class="title1">Enter CDP Account ID</div>
-      <div class="title2"></div>
-      <div>
-        <el-input
-          clearable
-          class="cdp-search-filter-input"
-          prefix-icon="el-icon-search"
-          type="text"
-          v-model="query.accountId"
-          @keyup.enter.native="searchLoanPositionByAccountId"
-        ></el-input>
-      </div>
+  <div class="karura-detail-page">
+    <div class="mobile-back-title">
+      <img
+        class="back"
+        @click="$router.back()"
+        src="@/assets/images/back.png"
+        alt=""
+      />
+      <span class="text">Detail</span>
     </div>
-    <div v-show="!ifWhiteTheme" class="loanPositionStatistic">
-      <div class="loanposition">
-        <el-row>
-          <el-col :span="7">
+    <div class="page-content">
+      <div class="info-wrap">
+        <div class="info-top">
+          <div class="title">
+            <img
+              class="logo"
+              src="./../../assets/images/wallet-login-icon-bak.png"
+            />
+            <div class="text">
+              {{ currentLoanPosition.accountId | shorterAddress }}
+            </div>
+          </div>
+          <div class="item-list">
             <div class="item">
-              <div class="desc" style="text-align: left">Owner</div>
-              <div class="value owner-account" style="text-align: left">
-                {{ currentLoanPosition.accountId | shorterAddress }}
+              <div class="label">Callateral</div>
+              <div class="text">
+                {{ currentLoanPosition.collateralFormat | roundNumber }} KSM
               </div>
-            </div></el-col
-          >
-          <el-col :span="4">
+            </div>
             <div class="item">
-              <div class="desc">Collateral</div>
-              <div class="value">
-                {{ currentLoanPosition.collateralFormat | roundNumber
-                }}<span class="unit">KSM</span>
+              <div class="label">Debt</div>
+              <div class="text">
+                {{ currentLoanPosition.debitFormat | roundNumber }} KUSD
               </div>
-            </div></el-col
-          >
-          <el-col :span="4">
+            </div>
             <div class="item">
-              <div class="desc">Debt</div>
-              <div class="value">
-                {{ currentLoanPosition.debitFormat | roundNumber
-                }}<span class="unit">KUSD</span>
-              </div>
-            </div></el-col
-          >
-          <el-col :span="4">
-            <div class="item">
-              <div class="desc">
-                <div
-                  class="ratio-status"
-                  :class="currentLoanPosition.status + '-bg'"
-                ></div>
+              <div class="label">
                 Ratio(Min:{{
                   chainState.liquidationRatioPercentage | roundNumber
                 }}%)
               </div>
-              <div class="value">
+              <div class="text" :class="currentLoanPosition.status + '-bg'">
                 {{ currentLoanPosition.ratioPercentage | roundNumber }}%
               </div>
-            </div></el-col
-          >
-          <el-col :span="3">
+            </div>
             <div class="item">
-              <div class="desc">Current price:</div>
-              <div class="value">
-                {{ currentLoanPosition.collateralPrice | roundNumber }}
+              <div class="label">Current price</div>
+              <div class="text">
+                ${{ currentLoanPosition.collateralPrice | roundNumber }}
               </div>
-            </div></el-col
-          >
-        </el-row>
-      </div>
-      <div class="statistic">
-        <el-row>
-          <el-col :span="6">
+            </div>
+          </div>
+        </div>
+        <div class="split">
+          <div class="circle left"></div>
+          <div class="line"></div>
+          <div class="circle right"></div>
+        </div>
+        <div class="info-bottom">
+          <div class="row">
             <div class="item">
-              <div class="desc">Value Invested</div>
-              <div class="value">
+              <div class="label">Value Invested</div>
+              <div class="text">
                 ${{ statisticData.valueInvested | roundNumber }}
               </div>
             </div>
-          </el-col>
-          <el-col :span="6">
             <div class="item">
-              <div class="desc">Value Withdrawn</div>
-              <div class="value">
+              <div class="label">Value Withdrawn</div>
+              <div class="text">
                 ${{ statisticData.valueWithdraw | roundNumber }}
               </div>
-            </div></el-col
-          >
-          <el-col :span="6">
+            </div>
             <div class="item">
-              <div class="desc">CDP Balance</div>
-              <div class="value">
+              <div class="label">CDP Balance</div>
+              <div class="text">
                 ${{ statisticData.cdpBalance | roundNumber }}
               </div>
-            </div></el-col
-          >
-          <el-col :span="6">
-            <div class="item">
-              <div class="desc">Lifetime Profit</div>
-              <div class="value">
-                ${{ statisticData.lifetimeProfit | roundNumber }}
-              </div>
-            </div></el-col
-          >
-        </el-row>
-      </div>
-    </div>
-    <div v-show="ifWhiteTheme" class="common-back-title" style="margin-left:-100px;margin-right:-100px;">
-      <i class="el-icon-back" @click="$router.back()"></i>
-      <span class="text">{{ currentLoanPosition.accountId }}</span>
-    </div>
-    <div v-show="ifWhiteTheme" class="new-top">
-      <div class="left">
-        <div class="top">
-          <div class="title">Owner</div>
-          <div class="content">
-            {{ currentLoanPosition.accountId }}
+            </div>
+          </div>
+          <div class="last-row">
+            <div class="label">Lifetime Profi</div>
+            <div class="text">
+              ${{ statisticData.lifetimeProfit | roundNumber }}
+            </div>
           </div>
         </div>
-        <div class="bottom">
-          <div class="bottom-left">
-            <div class="item">
-              <div class="title">Callateral</div>
-              <div class="item-content">
-                <span class="number">{{
-                  currentLoanPosition.collateralFormat | roundNumber
-                }}</span>
-                <span class="unit">KSM</span>
-              </div>
+      </div>
+      <div class="history-wrap">
+        <div class="title">History</div>
+        <div class="kLine-chart" ref="kLineChart"></div>
+      </div>
+      <div class="action-list">
+        <div class="title">Action List</div>
+        <div class="list">
+          <div
+            v-for="(v, i) in loanActionList.list"
+            :key="i"
+            class="item"
+            @click="clickItem(v)"
+          >
+            <div class="item-title">
+              <div class="text">{{ v.date }}</div>
+              <img src="@/assets/images/karura/arrow.png" alt="" />
             </div>
-            <div class="item">
-              <div class="title">Debt</div>
-              <div class="item-content">
-                <span class="number">{{
-                  currentLoanPosition.debitFormat | roundNumber
-                }}</span>
-                <span class="unit">KUSD</span>
+            <div class="form-list">
+              <div class="form-item">
+                <div class="label">Activity</div>
+                <div class="text">{{ v.type }} KUSD</div>
               </div>
-            </div>
-            <div class="item">
-              <div class="title">
-                <div
-                  class="ratio-status"
-                  :class="currentLoanPosition.status + '-bg'"
-                ></div>
-                <span>
-                  Ratio(Min:{{
-                    chainState.liquidationRatioPercentage | roundNumber
-                  }}%)
-                </span>
+              <div class="form-item">
+                <div class="label">Collateral Change</div>
+                <div class="text">
+                  {{ v.collateralAdjustment | formatKUSAMA }}&nbsp;KSM
+                </div>
               </div>
-              <div class="item-content">
-                <div class="number">
-                  {{ currentLoanPosition.ratioPercentage | roundNumber }}%
+              <div class="form-item">
+                <div class="label">Debt Change</div>
+                <div class="text">{{ v.debitAdjustment }}&nbsp;KUSD</div>
+              </div>
+              <div class="form-item">
+                <div class="label">Radio</div>
+                <div class="text">
+                  {{ v.ratioBefore }}&nbsp;% &nbsp;>&nbsp;{{ v.ratioAfter }}%
                 </div>
               </div>
             </div>
           </div>
-          <div class="bottom-right">
-            <div class="title">Current price:</div>
-            <div class="number">
-              ${{ currentLoanPosition.collateralPrice | roundNumber }}
-            </div>
-          </div>
         </div>
       </div>
-      <div class="right">
-        <div class="item">
-          <span class="title">Value Invested:</span>
-          <span class="value"
-            >${{ statisticData.valueInvested | roundNumber }}</span
-          >
-        </div>
-        <div class="item">
-          <span class="title">Value Withdrawn:</span>
-          <span class="value"
-            >${{ statisticData.valueWithdraw | roundNumber }}</span
-          >
-        </div>
-        <div class="item">
-          <span class="title">CDP Balance:</span>
-          <span class="value"
-            >${{ statisticData.cdpBalance | roundNumber }}</span
-          >
-        </div>
-        <div class="item special">
-          <span class="title">Lifetime Profit:</span>
-          <span class="value green">
-            ${{ statisticData.lifetimeProfit | roundNumber }}</span
-          >
-        </div>
-      </div>
-    </div>
-    <div class="kLine-section">
-      <div class="kline-section-interact">
-        <div class="kline-section-title">History</div>
-        <div class="kline-section-timerange">
-          <div class="timerange-item" @click="changeTimeRange('7D')">7D</div>
-          <div class="timerange-item" @click="changeTimeRange('1M')">1M</div>
-          <div class="timerange-item" @click="changeTimeRange('3M')">3M</div>
-          <div class="timerange-item" @click="changeTimeRange('ALL')">ALL</div>
-        </div>
-      </div>
-      <div class="kLine-chart" ref="kLineChart"></div>
     </div>
   </div>
 </template>
 
 <script>
 import { BigNumber } from "bignumber.js";
-import css from "./cpd.less";
 import cdpService from "@/api/cdp-analysis";
 export default {
   name: "CDPDetail",
@@ -236,11 +157,23 @@ export default {
 
       kLineData: [],
       kLineChartInstance: null,
-      kLine_startTime: new Date("2021-01-01").getTime(),
+      kLine_startTime: 0,
+      kLine_timeInterval: "1h",
+
+      loanActionList: { totalCount: 0, list: [] },
+
+      currentPage: 1,
+      pageSize: 10,
     };
   },
   created() {
     let self = this;
+
+    let days = this.$moment()
+      .subtract(30 * 6, "days")
+      .format("YYYY-MM-DD");
+    self.kLine_startTime = new Date(days).getTime();
+
     let query = self.$route.query;
     if (query && query.id) {
       self.query.id = query.id;
@@ -248,6 +181,7 @@ export default {
     if (query && query.accountId) {
       self.query.accountId = query.accountId;
     }
+
     this.searchLoanPositionByAccountId();
     this.loadChainState();
   },
@@ -259,6 +193,19 @@ export default {
     }
   },
   methods: {
+    clickItem(v) {
+      this.$router.push({
+        name: "CDPActionDetail",
+        query: { data: JSON.stringify(v) },
+      });
+    },
+    handleSizeChange(val) {
+      this.currentPage = 1;
+      this.pageSize = val;
+    },
+    handleCurrentChange(val) {
+      this.currentPage = val;
+    },
     loadLoanPositionStatistic() {
       let self = this;
 
@@ -320,6 +267,8 @@ export default {
 
             self.loadLoanPositionStatistic();
             self.loadLoanPositionKLine();
+
+            self.loadLoanActionList();
           }
         })
         .catch((err) => {
@@ -327,29 +276,34 @@ export default {
           console.error(err);
         });
     },
-    changeTimeRange(range) {
-      let now = new Date().getTime();
-      if (range == "7D") {
-        this.kLine_startTime = now - 7 * 24 * 60 * 60 * 1000;
-      }
-      if (range == "1M") {
-        this.kLine_startTime = now - 30 * 24 * 60 * 60 * 1000;
-      }
-      if (range == "3M") {
-        this.kLine_startTime = now - 90 * 24 * 60 * 60 * 1000;
-      }
-      if (range == "ALL") {
-        this.kLine_startTime = new Date("2021-01-01").getTime();
-      }
-      this.loadLoanPositionKLine();
-    },
+    // changeTimeRange(range) {
+    //   let now = new Date().getTime();
+    //   if (range == "7D") {
+    //     this.kLine_startTime = now - 7 * 24 * 60 * 60 * 1000;
+    //   }
+    //   if (range == "1M") {
+    //     this.kLine_startTime = now - 30 * 24 * 60 * 60 * 1000;
+    //   }
+    //   if (range == "3M") {
+    //     this.kLine_startTime = now - 90 * 24 * 60 * 60 * 1000;
+    //   }
+    //   if (range == "ALL") {
+    //     this.kLine_startTime = new Date("2021-10-01").getTime();
+    //   }
+    //   this.loadLoanPositionKLine();
+    // },
     loadLoanPositionKLine() {
       let self = this;
 
       let startTime = this.kLine_startTime;
       let endTime = new Date().getTime();
-      let timeInterval = "15m";
+      let timeInterval = this.kLine_timeInterval;
       self.loading = true;
+      if (self.kLineChartInstance == null) {
+        self.kLineChartInstance = echarts.init(this.$refs.kLineChart);
+        self.kLineChartInstance.showLoading();
+      }
+
       cdpService
         .getLoanActionKline({
           chain: "Karura",
@@ -372,7 +326,28 @@ export default {
           console.error(err);
         });
     },
+    loadLoanActionList() {
+      let self = this;
+      self.loading = true;
 
+      cdpService
+        .getLoanActionList({
+          chain: "Karura",
+          symbol: "KSM",
+          accountId: self.query.accountId,
+        })
+        .then((resp) => {
+          self.loading = false;
+          if (resp) {
+            self.loanActionList.totalCount = resp.totalCount;
+            self.loanActionList.list = self.formatLoanActionData(resp.list);
+          }
+        })
+        .catch((err) => {
+          self.loading = false;
+          console.error(err);
+        });
+    },
     showKLineChart(data) {
       let self = this;
       if (self.kLineChartInstance == null) {
@@ -403,8 +378,8 @@ export default {
         },
         legend: {
           data: ["KSM Price", "Ratio", "Profit"],
-          top: "96%",
           icon: "circle",
+          top: 15,
           itemWidth: 10,
           itemHeight: 10,
           itemGap: 40,
@@ -413,9 +388,9 @@ export default {
           },
         },
         grid: {
-          left: "10",
-          right: "100",
-          bottom: "100",
+          left: "0",
+          right: "10",
+          bottom: "10",
           containLabel: true,
           borderWidth: 3,
         },
@@ -424,17 +399,17 @@ export default {
             // saveAsImage: {}
           },
         },
-        dataZoom: [
-          {
-            height: 45,
-            bottom: "7%",
-            show: true,
-            realtime: true,
-            start: 90,
-            end: 100,
-            xAxisIndex: [0, 1],
-          },
-        ],
+        // dataZoom: [
+        //   {
+        //     height: 45,
+        //     bottom: "7%",
+        //     show: true,
+        //     realtime: true,
+        //     start: 90,
+        //     end: 100,
+        //     xAxisIndex: [0, 1],
+        //   },
+        // ],
         xAxis: {
           type: "category",
           boundaryGap: false,
@@ -446,7 +421,7 @@ export default {
             type: "value",
             name: "KSM Price",
             nameLocation: "start",
-            nameGap:20,
+            nameGap: 20,
             nameTextStyle: {
               color: "#888888",
               align: "center",
@@ -471,7 +446,7 @@ export default {
             type: "value",
             name: "Ratio",
             nameLocation: "start",
-            nameGap:80,
+            nameGap: 20,
             nameTextStyle: {
               color: "#888888",
               align: "left",
@@ -495,7 +470,7 @@ export default {
             type: "value",
             name: "Profit",
             nameLocation: "start",
-            nameGap:20,
+            nameGap: 20,
             nameTextStyle: {
               color: "#888888",
               align: "left",
@@ -506,7 +481,9 @@ export default {
               },
             },
             axisLabel: {
-              formatter: "${value}",
+              formatter: function (value) {
+                return value / 1000 + "k";
+              },
             },
             splitLine: {
               lineStyle: { type: "dashed" },
@@ -566,6 +543,7 @@ export default {
         ],
       };
       self.kLineChartInstance.setOption(option);
+      self.kLineChartInstance.hideLoading();
     },
     getRatio(d) {
       return this.getLoanRatioPercentage(
@@ -575,6 +553,7 @@ export default {
       );
     },
     getLoanRatioPercentage(collateral, price, debit) {
+      // debugger
       let collateralAmount = new BigNumber(collateral);
       let debitAmount = new BigNumber(debit);
       let priceNumber = new BigNumber(price);
@@ -605,245 +584,255 @@ export default {
     },
     formatTimestamp(timestamp) {
       let d = new Date(parseInt(timestamp));
-      return d.toISOString().substring(5, 16).replace("T", " ");
+      // return d.toISOString().substring(5, 16).replace("T", " ");
+      return this.$moment(d).format("MM-DD");
+    },
+    formatDebit(debit, precision) {
+      let debitScale = new BigNumber("1e13");
+      let debitBig = new BigNumber(debit);
+      let debitAmount = debitBig.div(debitScale);
+      let precision_format = precision || 2;
+      return debitAmount.toFixed(precision_format);
+    },
+    formatCollateral(collateral, precision) {
+      let collateralScale = new BigNumber("1e12");
+      let collateralBig = new BigNumber(collateral);
+      let collateralAmount = collateralBig.div(collateralScale);
+      let precision_format = precision || 2;
+      return collateralAmount.toFixed(precision_format);
+    },
+    formatLoanActionData(list) {
+      for (const d of list) {
+        d.date = new Date(parseInt(d.timestamp))
+          .toISOString()
+          .substring(0, 19)
+          .replace("T", " ");
+
+        // d.blockNumber ;
+        // d.collateralPrice  ;
+
+        d.collateralBefore = this.formatCollateral(
+          new BigNumber(d.collateral)
+            .minus(new BigNumber(d.collateralAdjustment))
+            .toNumber(),
+          2
+        );
+        d.collateralAfter = this.formatCollateral(
+          new BigNumber(d.collateral).toNumber(),
+
+          2
+        );
+
+        d.debitBefore = this.formatDebit(
+          new BigNumber(d.debit)
+            .minus(new BigNumber(d.debitAdjustment))
+            .toNumber(),
+
+          2
+        );
+        d.debitAfter = this.formatDebit(
+          new BigNumber(d.debit).toNumber(),
+
+          2
+        );
+        d.ratioBefore = this.getLoanRatioPercentage(
+          d.collateralBefore,
+          d.collateralPrice,
+          d.debitBefore
+        );
+
+        d.ratioAfter = this.getLoanRatioPercentage(
+          d.collateralAfter,
+          d.collateralPrice,
+          d.debitAfter
+        );
+
+        d.debitAdjustmentFormated = this.formatDebit(
+          new BigNumber(d.debitAdjustment).toNumber(),
+          2
+        );
+        d.debitAdjustmentClass =
+          d.debitAdjustmentFormated > 0 ? "red" : "green";
+
+        d.collateralAdjustmentFormated = this.formatCollateral(
+          new BigNumber(d.collateralAdjustment).toNumber(),
+          2
+        );
+        d.collateralAdjustmentClass =
+          d.collateralAdjustmentFormated >= 0 ? "green" : "red";
+      }
+
+      return list;
     },
   },
 };
 </script>
 
 <style scoped lang="less">
-.cdp-detail-page {
-  .loanPositionStatistic {
-    margin: 30px 0px 30px;
-    background: #212121;
-    border-radius: 6px;
-    padding: 24px 24px;
-    .loanposition {
-      padding: 0px 0px 24px;
-
-      .item {
-        .owner-account {
-          font-size: 16px !important;
-        }
-        .desc {
+.karura-detail-page {
+  background: #f4f5f7;
+  .page-content {
+    text-align: left;
+    padding: 16px;
+  }
+  .info-wrap {
+    padding: 16px;
+    background: #ffffff;
+    border-radius: 10px;
+    .info-top {
+      .title {
+        display: flex;
+        align-items: center;
+        margin-bottom: 16px;
+        .logo {
+          width: 24px;
           height: 24px;
-          text-align: right;
-          font-size: 16px;
-          color: rgba(255, 255, 255, 0.45);
+          margin-right: 8px;
         }
-        .value {
-          height: 40px;
-          line-height: 40px;
-          font-size: 24px;
-          color: #ffffff;
-        }
-        .unit {
-          float: right;
-          margin-left: 10px;
-          font-size: 12px;
-          color: rgba(255, 255, 255, 0.45);
-        }
-        .ratio-status {
-          width: 8px;
-          height: 8px;
-          border-radius: 8px;
-          display: inline-block;
-        }
-      }
-    }
-    .statistic {
-      border-top: dashed 1px #ddd;
-      padding: 24px 0px 0px;
-      .item {
-        display: flex;
-        .desc {
-          margin-right: 10px;
+        .text {
           font-size: 18px;
-          color: rgba(255, 255, 255, 0.45);
-        }
-        .value {
-          font-size: 18px;
-          color: #ffffff;
+          font-weight: bold;
+          color: #292828;
         }
       }
-    }
-  }
-  .kLine-chart {
-    width: 100%;
-    height: 600px;
-  }
-
-  .kline-section-interact {
-    margin-top: 20px;
-    display: flex;
-    justify-content: space-between;
-    .kline-section-title {
-      font-size: 24px;
-      font-family: Rubik-Medium, Rubik;
-      font-weight: 500;
-      color: #ffffff;
-    }
-
-    .kline-section-timerange {
-      display: none;
-      // display: flex;
-      margin-right: 15%;
-
-      background: #1e1e28;
-      border-radius: 6px;
-      .timerange-item {
-        z-index: 9999;
-        cursor: pointer;
-        margin: 2px;
-        padding: 6px 6px;
-        font-size: 14px;
-        font-family: Rubik-Regular, Rubik;
-        font-weight: 400;
-        color: rgba(255, 255, 255, 0.45);
-        &:hover {
-          background: #11111a;
-          color: #17c684;
-        }
-      }
-    }
-  }
-  .head-back {
-    position: absolute;
-    top: -30px;
-  }
-  .head-back span {
-    cursor: pointer;
-    font-size: 14px;
-    color: rgba(255, 255, 255, 0.87);
-  }
-  .head-back span i {
-    margin-right: 5px;
-  }
-  .head-back span:hover {
-    color: #17c684;
-  }
-}
-body.white-theme .cdp-detail-page {
-  .kline-section-interact .kline-section-title {
-    color: rgba(41, 40, 40, 0.8);
-  }
-  .kLine-section {
-    padding: 15px 40px;
-    background: white !important;
-  }
-  .new-top {
-    display: flex;
-    padding: 24px 40px;
-    .left {
-      padding: 24px;
-      background: white;
-      margin-right: 18px;
-      flex: 1;
-      .top {
-        border-bottom: 1px solid rgba(41, 40, 40, 0.1);
-        text-align: left;
-        padding-bottom: 20px;
-        .title {
-          font-size: 20px;
-          font-family: Rubik-Regular, Rubik;
-          font-weight: 400;
-          color: rgba(41, 40, 40, 0.4);
-        }
-        .content {
-          font-size: 24px;
-          font-family: Rubik-Regular, Rubik;
-          font-weight: 400;
-          color: rgba(41, 40, 40, 0.8);
-        }
-      }
-      .bottom {
-        display: flex;
-        padding-top: 20px;
-        .bottom-left {
-          flex: 1;
-          display: flex;
-          padding-right: 27px;
-          border-right: 1px solid rgba(41, 40, 40, 0.1);
-          .item {
-            flex: 1;
-            .ratio-status {
-              width: 8px;
-              height: 8px;
-              border-radius: 8px;
-              display: inline-block;
-            }
-            .title {
-              text-align: left;
-              font-size: 16px;
-              font-family: Rubik-Regular, Rubik;
-              font-weight: 400;
-              color: rgba(41, 40, 40, 0.6);
-            }
-            .item-content {
-              text-align: left;
-              margin-top: 8px;
-              .number {
-                font-size: 32px;
-                font-family: Rubik-Regular, Rubik;
-                font-weight: 400;
-                color: rgba(41, 40, 40, 0.8);
-              }
-              .unit {
-                font-size: 14px;
-                font-family: Rubik-Regular, Rubik;
-                font-weight: 400;
-                color: rgba(41, 40, 40, 0.4);
-              }
-            }
-          }
-        }
-        .bottom-right {
-          padding-left: 25px;
-          flex: none;
-          text-align: left;
-          .title {
-            font-size: 14px;
-            font-family: Rubik-Regular, Rubik;
-            font-weight: 400;
-            color: rgba(41, 40, 40, 0.6);
-          }
-          .number {
-            margin-top: 8px;
-            font-size: 20px;
-            font-family: Rubik-Regular, Rubik;
-            font-weight: 400;
-            color: rgba(41, 40, 40, 0.8);
-          }
-        }
-      }
-    }
-    .right {
-      padding: 14px 24px;
-      background: white;
-      flex: none;
-      width: 248px;
       .item {
+        margin-top: 8px;
         display: flex;
         justify-content: space-between;
-        align-items: center;
-        padding: 14px 0;
-        &.special {
-          border-top: 1px solid rgba(41, 40, 40, 0.1);
-          padding-bottom: 5px;
-        }
-        .title {
+        .label {
           font-size: 14px;
-          font-family: Rubik-Regular, Rubik;
-          font-weight: 400;
-          color: rgba(41, 40, 40, 0.6);
+          color: #7f7e7e;
         }
-        .value {
-          font-size: 20px;
-          font-family: Rubik-Regular, Rubik;
-          font-weight: 400;
-          color: rgba(41, 40, 40, 0.8);
-          &.green {
-            color: #38cb98;
+        .text {
+          font-size: 14px;
+          color: #545353;
+        }
+        .Safe-bg {
+          color: #17c684;
+        }
+
+        .Warning-bg {
+          color: #ffad00;
+        }
+
+        .Danger-bg {
+          color: #ea3943;
+        }
+      }
+    }
+    .split {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 0 -32px;
+      padding: 4px 0;
+      .circle {
+        margin: 0 8px;
+        flex: none;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #f4f5f7;
+      }
+      .line {
+        flex: 1;
+        height: 1px;
+        background: #a9a9a9;
+        opacity: 0.2;
+      }
+    }
+    .info-bottom {
+      .row {
+        display: flex;
+        justify-content: space-between;
+        .item {
+          .label {
+            font-size: 10px;
+            color: #7f7e7e;
+          }
+          .text {
+            margin-top: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #545353;
+          }
+        }
+      }
+      .last-row {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 8px;
+        .label {
+          font-size: 14px;
+          color: #7f7e7e;
+        }
+        .text {
+          font-size: 14px;
+          color: #38cb98;
+        }
+      }
+    }
+  }
+  .history-wrap {
+    margin-top: 16px;
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 16px;
+    .title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #292828;
+    }
+    .kLine-chart {
+      width: 100%;
+      height: 340px;
+    }
+  }
+  .action-list {
+    margin-top: 16px;
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 16px;
+    .title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #292828;
+      margin-top: 16px;
+    }
+    .list {
+      .item {
+        padding: 12px;
+        border-bottom: 1px solid rgba(169, 169, 169, 0.2);
+        &:last-child {
+          border-bottom: 0;
+        }
+        .item-title {
+          padding: 4px 0;
+
+          display: flex;
+          justify-content: space-between;
+          .text {
+            font-size: 14px;
+            color: #292828;
+          }
+          img {
+            width: 16px;
+            height: 16px;
+          }
+        }
+        .form-list {
+          .form-item {
+            padding: 4px 0;
+            display: flex;
+            justify-content: space-between;
+            .label {
+              font-size: 14px;
+              color: #7f7e7e;
+            }
+            .text {
+              font-size: 14px;
+              color: #545353;
+            }
           }
         }
       }

@@ -21,6 +21,8 @@ import ParaChainCrowdloanContributionDetail4Polkadot from '@/components/paraChai
 
 import CDPProfiler from '@/components/cdpProfiler/CDPProfiler'
 import CDPDetail from '@/components/cdpProfiler/CDPDetail'
+import CDPActionDetail from '@/components/cdpProfiler/CDPActionDetail'
+
 import CustomQuery from '@/components/customQuery/CustomQuery'
 import MoonRiver from '@/components/moonRiver/index'
 import MoonRiverAction from '@/components/moonRiver/action'
@@ -156,7 +158,14 @@ export default new Router({
             },
             component: CDPDetail
         },
-
+        {
+            path: '/CDPActionDetail',
+            name: 'CDPActionDetail',
+            meta: {
+                noHead: true
+            },
+            component: CDPActionDetail
+        },
         {
             path: '/CustomQuery',
             name: 'CustomQuery',

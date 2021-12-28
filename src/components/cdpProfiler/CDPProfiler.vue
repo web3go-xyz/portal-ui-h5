@@ -65,7 +65,12 @@
       v-infinite-scroll="load"
       :infinite-scroll-disabled="disabled"
     >
-      <div class="item"  @click="showLoanPositionDetail(d)" v-for="d in loanPositionTableData" :key="d.accountId">
+      <div
+        class="item"
+        @click="showLoanPositionDetail(d)"
+        v-for="d in loanPositionTableData"
+        :key="d.accountId"
+      >
         <div class="head">
           <div class="h-left">
             <img
@@ -99,7 +104,7 @@
       </div>
     </div>
     <div v-if="loading" class="footer">loading...</div>
-    <div v-if="noMore" class="footer">no more</div>
+    <div v-if="noMore && !loading" class="footer">no more</div>
   </div>
 </template>
 
@@ -188,7 +193,6 @@ export default {
 
     loadStatistic() {
       let self = this;
-      self.loading = true;
       cdpService
         .getChainStatistic({
           pageSize: 10,
@@ -198,13 +202,11 @@ export default {
           symbol: "KSM",
         })
         .then((resp) => {
-          self.loading = false;
           if (resp) {
             self.statisticData = resp;
           }
         })
         .catch((err) => {
-          self.loading = false;
           console.error(err);
         });
     },

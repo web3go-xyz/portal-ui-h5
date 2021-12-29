@@ -18,12 +18,11 @@
               src="./../../assets/images/wallet-login-icon-bak.png"
             />
             <div class="text">
-               <el-tooltip :content="currentLoanPosition.accountId">
+              <el-tooltip :content="currentLoanPosition.accountId">
                 <div class="row-walletAddress">
                   {{ currentLoanPosition.accountId | shorterAddress }}
                 </div>
               </el-tooltip>
-              
             </div>
           </div>
           <div class="item-list">
@@ -379,6 +378,7 @@ export default {
           text: "",
         },
         tooltip: {
+          confine: true,
           trigger: "axis",
         },
         legend: {
@@ -589,8 +589,7 @@ export default {
     },
     formatTimestamp(timestamp) {
       let d = new Date(parseInt(timestamp));
-      // return d.toISOString().substring(5, 16).replace("T", " ");
-      return this.$moment(d).format("MM-DD");
+      return d.toISOString().substring(5, 16).replace("T", " ");
     },
     formatDebit(debit, precision) {
       let debitScale = new BigNumber("1e13");

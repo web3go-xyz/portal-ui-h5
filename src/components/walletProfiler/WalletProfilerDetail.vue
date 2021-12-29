@@ -1,201 +1,157 @@
 <template>
-  <div class="content wallet-profiler-detail">
-    <div class="head extend-2-side">
-      <div v-show="ifWhiteTheme" class="common-back-title">
-        <i class="el-icon-back" @click="$router.back()"></i>
-        <span class="text">{{ query.walletAddress }}</span>
-      </div>
-      <div class="info-wrap">
-        <div class="g-wrap">
-          <div v-if="!ifWhiteTheme" class="head-back" @click="goBack">
-            <span><i class="el-icon-back"></i>Back</span>
-          </div>
-          <div class="head-mian">
-            <div class="left">
-              <p class="stitle">Token</p>
-              <div class="title">
-                <span class="test">{{
-                  walletAddressSimpleInfo.chainType
-                }}</span>
-              </div>
-              <p class="stitle">Wallet Address</p>
-              <p class="desc">
-                <input id="walletAddress" v-model="query.walletAddress" />
-                <span class="copyImg" @click="copy()"
-                  ><img :src="copyImg" alt="" class="copy"
-                /></span>
-                <el-tooltip
-                  v-for="l in walletAddressSimpleInfo.labels"
-                  :key="l.labelName"
-                  :content="getLabelDesciption(l.labelName)"
-                  placement="top"
-                >
-                  <span class="tag">
-                    {{ l.labelName }}
-                  </span>
-                </el-tooltip>
-              </p>
+  <div class="wallet-profilter-detail-page">
+    <div class="mobile-back-title">
+      <img
+        class="back"
+        @click="$router.back()"
+        src="@/assets/images/back.png"
+        alt=""
+      />
+      <span class="text">{{ query.walletAddress | shorterAddress }}</span>
+    </div>
+    <div class="page-main">
+      <div class="box">
+        <div class="title">
+          <el-tooltip :content="query.walletAddress">
+            <div>
+              {{ query.walletAddress | shorterAddress }}
             </div>
-            <div class="right">
-              <p class="stitle">Token Balance</p>
-              <div class="title">
-                <span class="test">{{
-                  Number(walletAddressSimpleInfo.balance).toFixed(2)
-                }}</span>
-              </div>
-              <p class="stitle">First trading time</p>
-              <p class="desc">
-                {{ walletAddressSimpleInfo.firstInDate | formatDate }}
-              </p>
+          </el-tooltip>
+          <div class="copy-wrap">
+            <input id="walletAddress" :value="query.walletAddress" />
+            <span class="copyImg" @click="copy()"
+              ><img :src="copyImg" alt="" class="copy"
+            /></span>
+          </div>
+        </div>
+        <div class="item-list">
+          <div class="item">
+            <div class="label">Token</div>
+            <div class="text">{{ walletAddressSimpleInfo.chainType }}</div>
+          </div>
+          <div class="item">
+            <div class="label">Token Balance</div>
+            <div class="text">
+              {{ Number(walletAddressSimpleInfo.balance).toFixed(2) }}
+            </div>
+          </div>
+          <div class="item">
+            <div class="label">First trading time</div>
+            <div class="text">
+              {{ walletAddressSimpleInfo.firstInDate | formatDate }}
             </div>
           </div>
         </div>
+        <div class="label-wrap">
+          <el-tooltip
+            class="item"
+            v-for="l in walletAddressSimpleInfo.labels"
+            :class="getColorClass(l.labelName)"
+            :key="l.labelName"
+            :content="getLabelDesciption(l.labelName)"
+            placement="top"
+          >
+            <span class="tag">
+              {{ l.labelName }}
+            </span>
+          </el-tooltip>
+        </div>
       </div>
-    </div>
-
-    <div class="g-wrap">
-      <div class="transaction">
-        <!-- 功能暂时隐藏 -->
-        <!-- <el-date-picker
-          class="date-picker"
-          v-model="timeRange"
-          type="datetimerange"
-          range-separator=""
-          size="mini"
-          @change="doSearch"
-        >
-        </el-date-picker> -->
+      <div class="box line-chart-wrap">
+        <div class="title">Token Balance Over Time</div>
         <div class="transactionChart" ref="transactionChart"></div>
       </div>
-      <div class="funds-list">
-        <div class="funds-card-item">
-          <div class="funds-card">
-            <div class="chart-container">
-              <div
-                ref="incomingFundsChart"
-                :style="{ width: '100%', height: '200px' }"
-              ></div>
-            </div>
-          </div>
-          <div class="direction-list">
-            <div class="direction-card">
-              <div class="direction-card-left">
-                <img :src="cardIcon1" alt="" class="cardIcon" />
-              </div>
-              <div class="direction-card-right">
-                <div class="value">
-                  {{ inComingTransactionCount }}
-                </div>
-                <div class="title">Incoming Transaction Count</div>
-              </div>
-            </div>
-            <div class="direction-card">
-              <div class="direction-card-left">
-                <img :src="cardIcon2" alt="" class="cardIcon" />
-              </div>
-              <div class="direction-card-right">
-                <div class="value">
-                  {{ inComingAddressCount }}
-                </div>
-                <div class="title">Incoming Address Count</div>
-              </div>
-            </div>
-          </div>
+      <div class="info-wrap">
+        <div class="info-top">
+          <div class="title">Incoming Funds</div>
+          <div class="bar-chart" ref="incomingFundsChart"></div>
         </div>
-        <div class="funds-card-item">
-          <div class="funds-card">
-            <div class="direction-card-left">
-              <span></span>
+        <div class="split">
+          <div class="circle left"></div>
+          <div class="line"></div>
+          <div class="circle right"></div>
+        </div>
+        <div class="info-bottom">
+          <div class="row">
+            <div class="left">
+              <img :src="cardIcon1" alt="" class="cardIcon" />
+              <span>Incoming Transaction Count</span>
             </div>
-            <div class="direction-card-right">
-              <div class="chart-container">
-                <div
-                  ref="outgoingFundsChart"
-                  :style="{ width: '100%', height: '200px' }"
-                ></div>
-              </div>
-            </div>
+            <div class="right">{{ inComingTransactionCount }}</div>
           </div>
-          <div class="direction-list">
-            <div class="direction-card">
-              <div class="direction-card-left">
-                <img :src="cardIcon3" alt="" class="cardIcon" />
-              </div>
-              <div class="direction-card-right">
-                <div class="value">
-                  {{ outgoingTransactionCount }}
-                </div>
-                <div class="title">Outgoing Transaction Count</div>
-              </div>
+          <div class="row">
+            <div class="left">
+              <img :src="cardIcon2" alt="" class="cardIcon" />
+              <span>Incoming Address Count</span>
             </div>
-            <div class="direction-card">
-              <div class="direction-card-left">
-                <img :src="cardIcon4" alt="" class="cardIcon" />
-              </div>
-              <div class="direction-card-right">
-                <div class="value">
-                  {{ outgoingAddressCount }}
-                </div>
-                <div class="title">Outgoing Address Count</div>
-              </div>
-            </div>
+            <div class="right">{{ inComingAddressCount }}</div>
           </div>
         </div>
       </div>
-
-      <div class="data-table">
-        <el-table
-          :key="Math.random()"
-          v-loading="loading"
-          element-loading-text="loading"
-          element-loading-spinner="el-icon-loading"
-          :data="walletAddressTransactionTableData"
-          style="width: 100%"
-        >
-          <el-table-column
-            label="Transaction Time"
-            prop="transactionTimestamp"
-            sortable
-          >
-            <template slot-scope="scope">
-              <div class="row-transactionTimestamp">
-                {{ scope.row.transactionTimestamp | formatDate }}
-              </div>
-            </template>
-          </el-table-column>
-          <el-table-column label="Direction" prop="direction" sortable>
-            <template slot-scope="scope">
-              <div class="row-direction">
-                {{ scope.row.direction == 1 ? "In" : "Out" }}
-              </div>
-            </template></el-table-column
-          >
-          <el-table-column prop="amount" label="Amount" sortable>
-            <template slot-scope="scope">
-              <div
-                :class="[
-                  scope.row.direction == 1
-                    ? 'amount amount-in'
-                    : 'amount amount-out',
-                ]"
-              >
-                <i class="el-icon-plus" v-if="scope.row.direction == 1"></i>
-                <i class="el-icon-minus" v-if="scope.row.direction == 2"></i>
-                <div>
-                  {{ scope.row.amount | amountFixed }}
-                </div>
-              </div>
-            </template>
-          </el-table-column>
-
-          <el-table-column prop="balanceAtPresent" label="Balance At Present">
-            <template slot-scope="scope">
-              <div class="row-balanceAtPresent">
-                {{ Number(scope.row.balanceAtPresent).toFixed(2) }}
-              </div>
-            </template>
-          </el-table-column>
-        </el-table>
+      <div class="info-wrap">
+        <div class="info-top">
+          <div class="title">Outcoming Funds</div>
+          <div class="bar-chart" ref="outgoingFundsChart"></div>
+        </div>
+        <div class="split">
+          <div class="circle left"></div>
+          <div class="line"></div>
+          <div class="circle right"></div>
+        </div>
+        <div class="info-bottom">
+          <div class="row">
+            <div class="left">
+              <img :src="cardIcon3" alt="" class="cardIcon" />
+              <span>Outgoing Transaction Count</span>
+            </div>
+            <div class="right">{{ outgoingTransactionCount }}</div>
+          </div>
+          <div class="row">
+            <div class="left">
+              <img :src="cardIcon4" alt="" class="cardIcon" />
+              <span>Outgoing Address Count</span>
+            </div>
+            <div class="right">{{ outgoingAddressCount }}</div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="box"
+        v-for="(v, i) in walletAddressTransactionTableData"
+        :key="i"
+      >
+        <div class="title">
+          {{ v.transactionTimestamp | formatDate }}
+        </div>
+        <div class="item-list">
+          <div class="item">
+            <div class="label">direction</div>
+            <div class="text">
+              {{ v.direction == 1 ? "In" : "Out" }}
+            </div>
+          </div>
+          <div class="item">
+            <div class="label">Transaction Amount</div>
+            <div
+              class="text"
+              :class="[
+                v.direction == 1 ? 'amount amount-in' : 'amount amount-out',
+              ]"
+            >
+              <i class="el-icon-plus" v-if="v.direction == 1"></i>
+              <i class="el-icon-minus" v-if="v.direction == 2"></i>
+              <span>
+                {{ v.amount | amountFixed }}
+              </span>
+            </div>
+          </div>
+          <div class="item">
+            <div class="label">Balance At Present</div>
+            <div class="text">
+              {{ Number(v.balanceAtPresent).toFixed(2) }}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -205,7 +161,7 @@
 import { Decimal } from "decimal.js";
 import wsService from "@/api/wallet-analysis";
 import logoImg from "@/assets/images/logo.png";
-import copyImg from "@/assets/images/copy.png";
+import copyImg from "@/assets/images/walletProfilter/copy.png";
 import cardIcon1 from "@/assets/images/cardIcon1.png";
 import cardIcon2 from "@/assets/images/cardIcon2.png";
 import cardIcon3 from "@/assets/images/cardIcon3.png";
@@ -270,6 +226,20 @@ export default {
     });
   },
   methods: {
+    getColorClass(labelName) {
+      if (labelName == "Strong Holder") {
+        return "color0";
+      }
+      if (labelName == "High Balance") {
+        return "color1";
+      }
+      if (labelName == "High Activity") {
+        return "color2";
+      }
+      if (labelName == "EXCHANGE") {
+        return "color3";
+      }
+    },
     getLabelDesciption(name) {
       const obj = this.labelDefList.find((v) => v.name == name);
       if (obj) {
@@ -281,6 +251,7 @@ export default {
       const copyEl = document.getElementById("walletAddress");
       copyEl.select(); // 选择对象
       document.execCommand("copy"); // 执行浏览器复制命令
+      this.$message.success("Already copied");
     },
     doSearch() {
       this.queryWalletAddressSimpleInfo(this.query);
@@ -398,21 +369,18 @@ export default {
         );
       }
       this.transactionChartInstance.setOption({
-        title: {
-          left: 20,
-          text: "Token Balance Over Time",
-          textStyle: {
-            color: this.ifWhiteTheme ? "rgba(41, 40, 40, 0.8)" : "#fff",
-          },
-        },
         grid: {
-          left:25,
-          right:25,
-          bottom:30,
+          top: 10,
+          left: 10,
+          right: 10,
+          bottom: 10,
           containLabel: true,
         },
         tooltip: {
-          formatter: function (val) {
+          confine: true,
+          trigger: "axis",
+          formatter: function (arr) {
+            const val = arr[0];
             return `
             ${val.name}<br/>
             ${val.marker} ${
@@ -495,28 +463,21 @@ export default {
           "rgba(255, 171, 0, 1)",
           "rgba(91, 127, 255, 1)",
         ],
-        title: {
-          text: "Incoming Funds",
-          textStyle: {
-            color: "rgba(41, 40, 40, 0.8)",
-          },
-          left: "50%",
-          top: 30,
-        },
-        tooltip: { trigger: "item" },
+        tooltip: { trigger: "item", confine: true },
         legend: {
           top: "35%",
           left: "50%",
           orient: "vertical",
+          icon: "circle",
           textStyle: {
             color: this.ifWhiteTheme ? "rgba(41, 40, 40, 0.8)" : "#fff",
           },
         },
         series: [
           {
-            center: ["20%", "50%"],
+            center: ["25%", "50%"],
             type: "pie",
-            radius: ["40%", "70%"],
+            radius: ["60%", "70%"],
             avoidLabelOverlap: false,
             label: {
               show: false,
@@ -538,24 +499,18 @@ export default {
       });
 
       this.outgoingFundsChartInstance.setOption({
-         color: [
+        color: [
           "rgba(234, 234, 234, 1)",
           "rgba(255, 86, 48, 1)",
           "rgba(255, 171, 0, 1)",
           "rgba(91, 127, 255, 1)",
         ],
-        title: {
-          text: "Outgoing Funds",
-          textStyle: {
-            color: "rgba(41, 40, 40, 0.8)",
-          },
-          left: "50%",
-          top: 30,
-        },
-        tooltip: { trigger: "item" },
+
+        tooltip: { trigger: "item", confine: true },
         legend: {
           top: "35%",
           left: "50%",
+          icon: "circle",
           orient: "vertical",
           textStyle: {
             color: this.ifWhiteTheme ? "rgba(41, 40, 40, 0.8)" : "#fff",
@@ -563,9 +518,9 @@ export default {
         },
         series: [
           {
-            center: ["20%", "50%"],
+            center: ["25%", "50%"],
             type: "pie",
-            radius: ["40%", "70%"],
+            radius: ["60%", "70%"],
             avoidLabelOverlap: false,
             label: {
               show: false,
@@ -641,387 +596,183 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="less" scoped>
-.head {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  text-align: left;
-  height: 283px;
-  background: #181818;
-}
-.head-back {
-  padding: 48px 0;
-}
-.head-back span {
-  cursor: pointer;
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.87);
-}
-.head-back span i {
-  margin-right: 5px;
-}
-.head-back span:hover {
-  color: #17c684;
-}
-.head-mian {
-  display: flex;
-}
-.head-mian > div {
-  flex: 1;
-}
-.head-mian > .left {
-  margin-right: 10px;
-}
-.head .stitle {
-  color: rgba(255, 255, 255, 0.38);
-  font-size: 12px;
-  margin: 0;
-}
-.head .test {
-  color: rgba(255, 255, 255, 0.87);
-  font-size: 40px;
-  font-family: Rubik-Bold, Rubik;
-  font-weight: bold;
-}
-.head .tag {
-  margin-left: 8px;
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 12px;
-  padding: 5px 12px;
-  background: #2b2b2b;
-  border-radius: 6px;
-}
-.head .desc {
-  margin: 0;
-  font-size: 14px;
-  margin-top: 4px;
-  display: flex;
-  align-items: center;
-  color: rgba(255, 255, 255, 0.6);
-}
-.head .desc img {
-  width: 16px;
-  cursor: pointer;
-  height: 16px;
-}
-.head .desc .copyImg {
-  position: relative;
-  top: 2px;
-  left: 4px;
-}
-.head .desc .copyImg:hover::after {
-  position: absolute;
-  border-radius: 10px;
-  display: inline-block;
-  top: -45px;
-  right: -20px;
-  width: 50px;
-  height: 39px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #2b2b2b;
-  box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.15);
-  opacity: 0.9;
-  color: rgba(255, 255, 255, 0.87);
-  content: "Copy";
-}
-#walletAddress {
-  background: none;
-  border: none;
-  font-size: 14px;
-  width: 324px;
-  padding: 0;
-  margin: 0;
-  outline: none;
-  color: rgba(255, 255, 255, 0.6);
-}
-.head .title {
-  margin-top: 9px;
-  margin-bottom: 9px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-}
-.transaction {
-  width:100%;
-  margin-top: 48px;
-  position: relative;
-}
-/deep/ .transaction .el-date-editor {
-  position: absolute;
-  z-index: 100;
-  right: 0;
-  top: 0;
-}
-.transactionChart {
-  width: 100% !important;
-  height: 400px;
-  left: 0 !important;
-}
-.header .item {
-  display: block;
-  text-align: left;
-  padding: 0px 20px;
-}
-.item .label {
-  color: lightgray;
-  font-size: 0.8rem;
-  font-weight: bold;
-  margin-left: 10px;
-  line-height: 25px;
-}
-.item .value {
-  color: white;
-  margin-left: 10px;
-  line-height: 35px;
-  font-size: 1.2rem;
-}
-
-.data-table {
-  margin-top: 20px;
-}
-
-.card-list {
-  display: flex;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  justify-content: space-between;
-}
-.card-list .card {
-  padding: 20px 0px 20px;
-  background-color: #173143;
-  width: 32%;
-}
-.card-list .card .label {
-  color: lightgray;
-  font-size: 0.8rem;
-  font-weight: bold;
-  line-height: 25px;
-}
-.card-list .card .value {
-  font-weight: bold;
-  font-size: 1.5rem;
-  color: white;
-  line-height: 35px;
-  text-align: center;
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-.card-list .card .value .label-tag {
-  font-size: 0.8rem;
-  font-weight: normal;
-  padding: 4px 6px;
-  background: gray;
-  width: fit-content;
-  border-radius: 5px;
-  line-height: initial;
-  /* float: left; */
-  margin-right: 5px;
-  margin-bottom: 3px;
-}
-.card-list .card .value.balance {
-  font-size: 2.5rem;
-}
-.card-list .card .value.firstInDate {
-  font-size: 1.2rem;
-}
-
-.funds-list {
-  display: flex;
-  margin-top: 24px;
-  margin-bottom: 24px;
-  justify-content: space-between;
-}
-.funds-card-item {
-  flex: 1;
-  border-radius: 6px;
-  padding: 40px;
-  box-sizing: border-box;
-  &:first-child {
-    margin-right: 24px;
-  }
-}
-.funds-list .funds-card {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding-bottom: 40px;
-  background-color: #173143;
-  border-radius: 6px;
-}
-.funds-list .funds-card .title {
-  color: white;
-  text-align: left;
-  padding-left: 10px;
-}
-.funds-list .funds-card .chart-container {
-}
-
-.direction-list {
-  display: flex;
-  padding-top: 40px;
-  justify-content: space-between;
-}
-.amount {
-  display: flex;
-  align-items: baseline;
-}
-.amount.amount-in {
-  color: #17c684;
-  padding-right: 5px;
-}
-.amount.amount-out {
-  color: #ea3943;
-  padding-right: 5px;
-}
-.funds-list .funds-card {
-  background: #181818;
-}
-.direction-list .direction-card {
-  background: #181818;
-}
-.funds-card-item {
-  background: #181818;
-}
-.direction-card {
-  display: flex;
-  align-items: center;
-  height: 40px;
-}
-.direction-card-left {
-  width: 40px;
-  margin-right: 12px;
-}
-.direction-card-right {
-  text-align: left;
-  flex: 1;
-}
-.direction-card-right .value {
-  margin-bottom: 4px;
-  font-size: 18px;
-  font-family: Rubik-Medium, Rubik;
-  color: rgba(255, 255, 255, 0.87);
-}
-.direction-card-right .title {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.38);
-}
-.data-table {
-  padding-bottom: 90px;
-}
-.row-transactionTimestamp {
-  color: rgba(255, 255, 255, 0.87);
-}
-.row-direction {
-  color: rgba(255, 255, 255, 0.6);
-}
-.row-balanceAtPresent {
-  color: rgba(255, 255, 255, 0.6);
-}
-/deep/ .el-table td .cell {
-  padding-left: 10px;
-}
-/deep/ .el-range-editor .el-range-input {
-  background-color: #111;
-}
-/deep/ .el-table tr:nth-child(2n) {
-  background-color: #111;
-}
-/deep/ .el-range-input {
-  font-size: 14px;
-}
-.cardIcon {
-  width: 16px;
-  height: 16px;
-  border: 12px solid #2b2b2b;
-  border-radius: 12px;
-}
-body.white-theme .wallet-profiler-detail {
-  .info-wrap {
-    margin-top: 24px;
-    padding-bottom: 24px;
-    background-image: url("~@/assets/images/top-bg.png");
-    background-size: cover;
-    background-position: center;
-  }
-  .head {
-    height: auto;
-    background: transparent;
-  }
-  .head-back span {
-    color: #17c684;
-  }
-  .head-back span:hover {
-    opacity: 0.8;
-  }
-  .head .stitle {
-    color: rgba(41, 40, 40, 0.6);
-  }
-  .head .test {
-    color: rgba(41, 40, 40, 1);
-  }
-  .head .tag {
-    color: rgba(41, 40, 40, 1);
-    background: rgba(225, 231, 237, 0.8);
-  }
-  .head .desc {
-    color: rgba(41, 40, 40, 0.8);
-  }
+.wallet-profilter-detail-page {
   #walletAddress {
-    color: rgba(41, 40, 40, 0.8);
+    background: none;
+    position: absolute;
+    border: none;
+    opacity: 0;
+    font-size: 14px;
+    width: 1px;
+    height: 0px;
+    padding: 0;
+    margin: 0;
+    outline: none;
+    color: rgba(255, 255, 255, 0.6);
   }
-  .funds-card-item {
-    background: white;
-  }
-  .funds-list .funds-card {
-    background: white;
-  }
-  .direction-list .direction-card {
-    background: white;
-  }
-  .funds-card-item {
-    background: white;
-  }
-  .funds-list .funds-card .title {
-    color: rgba(41, 40, 40, 0.8);
-    font-weight: bold;
-  }
-  .cardIcon {
-    border: 12px solid rgba(236, 246, 242, 1);
-  }
-  .direction-card-right .value {
-    color: rgba(41, 40, 40, 1);
-  }
-  .direction-card-right .title {
-    color: rgba(41, 40, 40, 0.6);
-  }
-  .data-table /deep/ .el-table tr:nth-child(2n) {
-    background-color: #f5f7f9;
-  }
-  .transaction {
-    margin-top: 24px;
-    border-radius: 6px;
-    background: white;
-    padding: 28px 0px;
-    padding-bottom: 0;
-  }
-  .row-transactionTimestamp {
-    color: rgba(41, 40, 40, 0.8);
-  }
-  .row-direction {
-    color: rgba(41, 40, 40, 0.8);
-  }
-  .row-balanceAtPresent {
-    color: rgba(41, 40, 40, 0.8);
-  }
-  @media screen and (max-width: 1440px) {
-    .common-back-title {
-      margin-left: 100px;
-      margin-right: 100px;
+  .page-main {
+    text-align: left;
+    padding: 16px;
+    .box {
+      margin-bottom: 16px;
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 16px;
+      .title {
+        font-size: 18px;
+        font-weight: bold;
+        color: #292828;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        .copy-wrap {
+          margin-left: 8px;
+          .copyImg {
+            display: flex;
+            align-items: center;
+            img {
+              width: 16px;
+              height: 16px;
+            }
+          }
+        }
+      }
+      .item-list {
+        .item {
+          margin-top: 8px;
+          display: flex;
+          justify-content: space-between;
+          .label {
+            font-size: 14px;
+            color: #7f7e7e;
+          }
+          .amount {
+            display: flex;
+            align-items: baseline;
+          }
+          .amount.amount-in {
+            color: #17c684;
+          }
+          .amount.amount-out {
+            color: #ea3943;
+          }
+          .text {
+            font-size: 14px;
+            color: #545353;
+            text-align: right;
+            .stable {
+            }
+            .float {
+              span {
+                font-size: 12px;
+                margin-right: 3px;
+              }
+              i {
+                font-size: 13px;
+              }
+            }
+          }
+        }
+      }
+      .label-wrap {
+        display: flex;
+        margin-top: 8px;
+        .item {
+          margin-right: 8px;
+          background: rgba(41, 40, 40, 0.05);
+          border-radius: 4px;
+          font-size: 14px;
+          color: #7f7e7e;
+          padding: 5px 8px;
+        }
+        .color0 {
+          background: rgb(226, 240, 236);
+          color: rgb(90, 205, 155);
+        }
+        .color1 {
+          background: rgba(22, 93, 255, 0.1);
+          color: rgba(22, 93, 255, 1);
+        }
+        .color2 {
+          background: rgba(248, 192, 87, 0.1);
+          color: rgba(248, 192, 87, 1);
+        }
+        .color3 {
+          background: rgba(255, 69, 48, 0.1);
+          color: rgba(255, 69, 48);
+        }
+      }
     }
-  }
-  @media screen and (min-width: 1440px) {
-    .common-back-title {
-      margin-left: 12vw;
-      margin-right: 12vw;
+    .line-chart-wrap {
+      .transactionChart {
+        width: 100%;
+        height: 340px;
+      }
+    }
+    .info-wrap {
+      margin-bottom: 16px;
+      padding: 16px;
+      background: #ffffff;
+      border-radius: 10px;
+      .info-top {
+        font-size: 18px;
+        font-weight: bold;
+        color: #292828;
+        margin-bottom: 12px;
+        .bar-chart {
+          height: 178px;
+          width: 100%;
+        }
+      }
+      .split {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 0 -32px;
+        padding: 4px 0;
+        .circle {
+          margin: 0 8px;
+          flex: none;
+          width: 16px;
+          height: 16px;
+          border-radius: 50%;
+          background: #f4f5f7;
+        }
+        .line {
+          flex: 1;
+          height: 1px;
+          background: #a9a9a9;
+          opacity: 0.2;
+        }
+      }
+      .info-bottom {
+        padding-top: 8px;
+        .row {
+          margin-bottom: 12px;
+          display: flex;
+          justify-content: space-between;
+          &:last-child {
+            margin-bottom: 0;
+          }
+          .left {
+            display: flex;
+            align-items: center;
+            img {
+              width: 16px;
+              height: 16px;
+              margin-right: 8px;
+            }
+            span {
+              font-size: 14px;
+              color: #7f7e7e;
+            }
+          }
+          .right {
+            font-size: 18px;
+            color: #545353;
+          }
+        }
+      }
     }
   }
 }

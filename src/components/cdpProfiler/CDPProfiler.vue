@@ -155,12 +155,12 @@ export default {
       self.query = paramsOnPage;
     }
     self.loadStatistic();
-
     self.loadLoanPositionTable();
   },
   methods: {
     changeCheckbox() {
       this.loanPositionTableData = [];
+      this.$set(this.query, "pageIndex", 1);
       this.loadLoanPositionTable();
     },
     load() {
@@ -177,6 +177,7 @@ export default {
         this.query.filterStatus.push(item.value);
       }
       this.loanPositionTableData = [];
+      this.$set(this.query, "pageIndex", 1);
       this.loadLoanPositionTable();
     },
     handleSizeChange(val) {
@@ -358,7 +359,7 @@ export default {
         background-size: contain;
         background-position: center;
       }
-      /deep/ .el-input__icon {
+      /deep/ .el-input__prefix .el-input__icon {
         line-height: 50px;
       }
     }
@@ -391,7 +392,7 @@ export default {
       background: #ffffff;
       border-radius: 10px;
       margin-bottom: 16px;
-      padding: 16px;
+      padding: 8px 16px;
       .head {
         display: flex;
         justify-content: space-between;

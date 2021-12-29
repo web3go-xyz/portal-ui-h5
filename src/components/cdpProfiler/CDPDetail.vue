@@ -18,7 +18,12 @@
               src="./../../assets/images/wallet-login-icon-bak.png"
             />
             <div class="text">
-              {{ currentLoanPosition.accountId | shorterAddress }}
+               <el-tooltip :content="currentLoanPosition.accountId">
+                <div class="row-walletAddress">
+                  {{ currentLoanPosition.accountId | shorterAddress }}
+                </div>
+              </el-tooltip>
+              
             </div>
           </div>
           <div class="item-list">

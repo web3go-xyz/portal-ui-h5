@@ -1,153 +1,85 @@
 <template>
-  <div class="content wallet-profiler-page">
-    <transition name="slide-fade">
-      <WalletLabelSetting @close="goSetting()" v-if="isShowSetting" />
-    </transition>
-    <div v-show="ifWhiteTheme" class="common-back-title">
-      <i class="el-icon-back" @click="$router.back()"></i>
-      <span class="text">{{ bigTitle }}</span>
+  <div class="wallet-profilter-page">
+    <div class="mobile-back-title">
+      <img
+        class="back"
+        @click="$router.back()"
+        src="@/assets/images/back.png"
+        alt=""
+      />
+      <span class="text">LIT Analysis</span>
     </div>
-
-    <div class="main">
-      <div v-show="!ifWhiteTheme" class="walletProfilerLogo">
-        <span>{{ bigTitle }}</span>
+    <div class="search-wrap">
+      <div class="key-search-wrap">
+        <el-input
+          clearable
+          class="key-search"
+          prefix-icon="el-icon-search"
+          placeholder="special wallet address"
+          type="text"
+          v-model="query.walletAddress"
+          @change="searchChange"
+        ></el-input>
       </div>
-      <div class="select-row">
-        <!-- <div class="select-title"></div> -->
-        <!-- <el-select
-          disabled
-          v-model="query.selectedChainContractAddress"
-          placeholder="filter by token"
-          @change="refreshData(true)"
-        >
-          <el-option
-            v-for="item in chainList4Select"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          >
-          </el-option>
-        </el-select> -->
-        <!-- <div class="select-title"></div> -->
-        <el-select
-          v-model="query.selectedLabel"
-          placeholder="filter by label"
-          @change="refreshData(true)"
-        >
-          <el-option
+      <div class="other-search">
+        <div class="o-left">
+          <div
             v-for="item in label4Select"
             :key="item.value"
-            :label="item.label"
-            :value="item.value"
-            :class="item.id === 'setting' ? 'setting' : ''"
+            class="item"
+            :class="
+              query.selectedLabel == item.value ? getColorClass(item.label) : ''
+            "
+            @click="clickItem(item)"
           >
-            <div
-              v-if="item.id === 'setting'"
-              @click="goSetting()"
-              class="settingLabel"
-            >
-              <img :src="settingImg" alt="" /> Label Setting
-            </div>
-          </el-option>
-        </el-select>
-        <div class="select-title"></div>
-        <div>
-          <el-input
-            v-on:keyup.enter.native="refreshData"
-            class="select-walletAddress"
-            v-model="query.walletAddress"
-            placeholder="special wallet address"
-          ></el-input>
+            <span>{{ item.label }}</span>
+          </div>
         </div>
-        <div class="select-title"></div>
-        <div class="select-reset-wrap">
-          <el-button @click="reset" class="select-reset">Reset</el-button>
-        </div>
-      </div>
-      <div class="data-table">
-        <el-table
-          @sort-change="sortChange"
-          row-class-name="g-table-row"
-          v-loading="loading"
-          element-loading-text="loading"
-          element-loading-spinner="el-icon-loading"
-          :data="walletAddressTableData"
-          style="width: 100%"
-        >
-          <el-table-column label="Wallet Address" width="250">
-            <template slot-scope="scope">
-              <el-tooltip :content="scope.row.walletAddress" placement="top">
-                <div class="row-walletAddress">
-                  {{
-                    formatAddressTag(scope.row.walletAddress) | shorterAddress
-                  }}
-                </div>
-              </el-tooltip>
-            </template>
-          </el-table-column>
-          <el-table-column label="Labels">
-            <template slot-scope="scope">
-              <div class="row-labels">
-                <el-tooltip
-                  v-for="l in sortLabel(scope.row.labels).slice(0, 4)"
-                  :key="l.labelName"
-                  :content="getLabelDesciption(l.labelName)"
-                  placement="top"
-                >
-                  <span>
-                    {{ l.labelName }}
-                  </span>
-                </el-tooltip>
-              </div>
-            </template></el-table-column
-          >
-          <el-table-column
-            prop="balance"
-            width="200"
-            label="Balance"
-            sortable="custom"
-          >
-            <template slot-scope="scope">
-              <div class="row-balance">
-                {{ Number(scope.row.balance).toFixed(2) }}
-              </div>
-            </template>
-          </el-table-column>
-
-          <el-table-column
-            prop="firstInDate"
-            label="First trading time"
-            sortable="custom"
-            width="210"
-          >
-            <template slot-scope="scope">
-              <div class="row-firstInDate">
-                {{ scope.row.firstInDate | formatDate }}
-              </div>
-            </template>
-          </el-table-column>
-          <el-table-column label="" width="100">
-            <template slot-scope="scope">
-              <div class="row-button" @click="gotoDetail(scope.row)">
-                view <i class="el-icon-back"></i>
-              </div>
-            </template>
-          </el-table-column>
-        </el-table>
-        <el-pagination
-          id="g-pagination"
-          v-show="walletAddressTotalCount > 0"
-          background
-          :total="walletAddressTotalCount"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          :page-sizes="[10, 20, 50, 100]"
-          :page-size="query.pageSize4WalletAddress"
-          layout="prev, pager, next, sizes, jumper"
-        >
-        </el-pagination>
       </div>
     </div>
+    <div
+      class="card-list"
+      v-infinite-scroll="load"
+      :infinite-scroll-disabled="disabled"
+    >
+      <div
+        class="item"
+        @click="gotoDetail(d)"
+        v-for="d in walletAddressTableData"
+        :key="d.id"
+      >
+        <div class="head">
+          <div class="h-left">
+            <span class="text">
+              {{ formatAddressTag(d.walletAddress) | shorterAddress }}
+            </span>
+          </div>
+          <img class="arrow" src="@/assets/images/karura/arrow.png" />
+        </div>
+        <div class="ul">
+          <div class="li">
+            <span class="label">Balance</span>
+            <span>{{ Number(d.balance).toFixed(2) }}</span>
+          </div>
+          <div class="li">
+            <span class="label">First trading time</span>
+            <span>{{ d.firstInDate | formatDate }}</span>
+          </div>
+        </div>
+        <div class="label-wrap">
+          <div
+            class="label-item"
+            v-for="l in sortLabel(d.labels).slice(0, 4)"
+            :class="getColorClass(l.labelName)"
+            :key="l.labelName"
+          >
+            {{ l.labelName }}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-if="loading" class="footer">loading...</div>
+    <div v-if="noMore && !loading" class="footer">no more</div>
   </div>
 </template>
 
@@ -195,6 +127,12 @@ export default {
     };
   },
   computed: {
+    noMore() {
+      return this.walletAddressTableData.length >= this.walletAddressTotalCount;
+    },
+    disabled() {
+      return this.loading || this.noMore;
+    },
     chainList4Select() {
       var d = [];
       if (this.chainList) {
@@ -212,9 +150,10 @@ export default {
           d.push({ label: c.name, value: c.name });
         });
       }
-      d.push({
-        id: "setting",
-      });
+      // 移动端去掉label setting
+      // d.push({
+      //   id: "setting",
+      // });
       return d;
     },
 
@@ -260,6 +199,43 @@ export default {
     });
   },
   methods: {
+    getColorClass(labelName) {
+      if (labelName == "Strong Holder") {
+        return "color0";
+      }
+      if (labelName == "High Balance") {
+        return "color1";
+      }
+      if (labelName == "High Activity") {
+        return "color2";
+      }
+      if (labelName == "EXCHANGE") {
+        return "color3";
+      }
+    },
+    searchChange() {
+      this.walletAddressTableData = [];
+      this.$set(this.query, "pageIndex4WalletAddress", 1);
+      this.refreshData();
+    },
+    clickItem(item) {
+      if (this.query.selectedLabel == item.value) {
+        this.$set(this.query, "selectedLabel", null);
+      } else {
+        this.$set(this.query, "selectedLabel", item.value);
+      }
+      this.walletAddressTableData = [];
+      this.$set(this.query, "pageIndex4WalletAddress", 1);
+      this.refreshData();
+    },
+    load() {
+      this.$set(
+        this.query,
+        "pageIndex4WalletAddress",
+        this.query.pageIndex4WalletAddress + 1
+      );
+      this.refreshData();
+    },
     sortLabel(labels) {
       const newArr = [];
       this.labelDefList.forEach((v) => {
@@ -420,7 +396,11 @@ export default {
                   }
                 }
               }
-              this.walletAddressTableData = d;
+              // this.walletAddressTableData = d;
+              this.walletAddressTableData = [
+                ...this.walletAddressTableData,
+                ...d,
+              ];
             }
           })
           .catch((err) => {
@@ -428,7 +408,8 @@ export default {
             console.error(err);
           });
       } else {
-        self.walletAddressTableData = d;
+        // self.walletAddressTableData = d;
+        this.walletAddressTableData = [...this.walletAddressTableData, ...d];
         self.loading = false;
       }
     },
@@ -452,148 +433,197 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 
 <style lang="less" scoped>
-.main {
-  background: url("../../assets/images/list-bg.png") no-repeat top right;
-  background-size: 30%;
-}
-.walletProfilerLogo {
-  height: 47px;
-  font-size: 40px;
-  font-family: Rubik-Medium, Rubik;
-  font-weight: 500;
-  color: #17c684;
-  line-height: 47px;
-  text-align: left;
-  margin-top: 48px;
-}
-.select-row {
-  margin-top: 33px;
-  display: flex;
-  color: white;
-  line-height: 40px;
-}
-.select-row .select-title {
-  margin-right: 10px;
-}
-.select-reset-wrap {
-  flex: 1;
-  text-align: right;
-}
-.select-reset {
-  border-radius: 6px;
-  width: 101px;
-}
-.data-table {
-  margin-top: 20px;
-}
-.data-table /deep/ td {
-  padding: 3.5px 8.5px;
-}
-.row-walletAddress {
-  color: rgba(255, 255, 255, 0.85);
-  font-weight: bold;
-}
-#g-pagination {
-  margin-top: 24px;
-  padding-bottom: 68px;
-  text-align: right;
-}
-.row-labels span {
-  padding: 5px 12px;
-  display: inline-block;
-  background: #2b2b2b;
-  color: rgba(255, 255, 255, 0.65);
-  border-radius: 16px;
-}
-.setting {
-  height: 42px;
-  line-height: 42px;
-  border: 1px solid rgba(255, 255, 255, 0.24);
-  color: #17c684;
-}
-.row-labels span:not(:last-child) {
-  margin-right: 8px;
-}
-.row-balance {
-  color: rgba(255, 255, 255, 0.65);
-}
-.row-firstInDate {
-  color: rgba(255, 255, 255, 0.65);
-}
-.row-button {
-  justify-content: flex-end;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  color: rgba(255, 255, 255, 0.87);
-}
-.row-button img {
-  margin-left: 4px;
-}
-.row-button:hover {
-  color: #17c684;
-}
-.slide-fade-enter-active {
-  transition: all 0.3s ease;
-}
-.slide-fade-leave-active {
-  transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
-}
-.slide-fade-enter,
-.slide-fade-leave-to {
-  transform: translate(100%);
-}
-.el-icon-back {
-  transform: rotate(180deg);
-  margin-left: 5px;
-}
-.settingLabel {
-  display: flex;
-  align-items: center;
-}
-.settingLabel img {
-  width: 16px;
-  height: 16px;
-  margin-right: 8px;
-}
-/deep/ .el-pagination__sizes .el-select {
-  width: auto;
-}
-body.white-theme {
-  .wallet-profiler-page .main {
-    padding-left: 100px;
-    padding-right: 100px;
-  }
-  .walletProfilerLogo {
-    color: #292828;
-    background: white;
-  }
-  .main {
-    background: rgb(245, 247, 249);
-  }
-  .row-walletAddress {
-    color: rgba(41, 40, 40, 0.8);
-  }
-  .row-labels span {
-    background: rgba(236, 246, 242, 1);
-    color: rgba(41, 40, 40, 0.6);
-  }
-  .row-balance {
-    color: rgba(41, 40, 40, 0.8);
-  }
-  .row-firstInDate {
-    color: rgba(41, 40, 40, 0.8);
-  }
-  .row-button {
-    color: #17c684;
-  }
-  .row-button:hover {
-    opacity: 0.8;
-  }
-  .select-row {
-    /deep/ .el-input__inner {
-      border: 1px solid transparent !important;
+.wallet-profilter-page {
+  .info-wrap {
+    display: flex;
+    padding: 16px;
+    padding-bottom: 0;
+    .item {
+      text-align: left;
+      padding: 16px;
+      flex: 1;
+      background: white;
+      border-radius: 10px;
+      &:last-child {
+        margin-left: 16px;
+      }
+      .top {
+        display: flex;
+        align-items: center;
+        img {
+          width: 24px;
+          height: 24px;
+          margin-right: 8px;
+        }
+        .text1 {
+          font-size: 16px;
+          color: #7f7e7e;
+        }
+        .text2 {
+          margin-left: 4px;
+          font-size: 12px;
+          color: #7f7e7e;
+        }
+      }
+      .bottom {
+        margin-top: 8px;
+        font-size: 16px;
+        color: #292828;
+      }
     }
   }
+  .key-search-wrap {
+    padding: 0 16px;
+    .key-search {
+      /deep/ .el-input__inner {
+        border-radius: 10px;
+        border: 0 !important;
+        height: 44px;
+        line-height: 44px;
+        padding-left: 35px;
+      }
+      /deep/ .el-icon-search::before {
+        display: inline-block;
+        content: "";
+        width: 16px;
+        height: 16px;
+        background-image: url(~@/assets/images/karura/search-icon.png);
+        background-size: contain;
+        background-position: center;
+      }
+      /deep/ .el-input__prefix .el-input__icon {
+        line-height: 50px;
+      }
+    }
+  }
+  .other-search {
+    text-align: left;
+    padding: 16px;
+    .o-left {
+      display: flex;
+      .item {
+        margin-right: 8px;
+        background: rgba(41, 40, 40, 0.05);
+        border-radius: 4px;
+        font-size: 14px;
+        color: #7f7e7e;
+        padding: 5px 8px;
+        &.color0 {
+          background: rgb(226, 240, 236);
+          color: rgb(90, 205, 155);
+        }
+        &.color1 {
+          background: rgba(22, 93, 255, 0.1);
+          color: rgba(22, 93, 255, 1);
+        }
+        &.color2 {
+          background: rgba(248, 192, 87, 0.1);
+          color: rgba(248, 192, 87, 1);
+        }
+        &.color3 {
+          background: rgba(255, 69, 48, 0.1);
+          color: rgba(255, 69, 48);
+        }
+      }
+    }
+    .o-right {
+      margin-top: 8px;
+    }
+  }
+  .card-list {
+    padding: 16px;
+    .item {
+      background: #ffffff;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      padding: 4px 16px;
+      .head {
+        display: flex;
+        justify-content: space-between;
+        .h-left {
+          display: flex;
+          align-items: center;
+          .logo {
+            width: 24px;
+            height: 24px;
+            margin-right: 8px;
+          }
+          .text {
+            font-size: 16px;
+            font-weight: bold;
+            color: #292828;
+          }
+        }
+        .arrow {
+          width: 16px;
+          height: 16px;
+        }
+      }
+      .ul {
+        .li {
+          padding: 4px 0;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-size: 14px;
+          color: #545353;
+          .label {
+            font-size: 14px;
+            color: #7f7e7e;
+          }
+        }
+      }
+      .label-wrap {
+        margin-top: 8px;
+        display: flex;
+        margin-bottom: 10px;
+        .label-item {
+          margin-right: 8px;
+          background: rgba(41, 40, 40, 0.05);
+          border-radius: 4px;
+          font-size: 14px;
+          color: #7f7e7e;
+          padding: 5px 8px;
+          &.color0 {
+            background: rgb(226, 240, 236);
+            color: rgb(90, 205, 155);
+          }
+          &.color1 {
+            background: rgba(22, 93, 255, 0.1);
+            color: rgba(22, 93, 255, 1);
+          }
+          &.color2 {
+            background: rgba(248, 192, 87, 0.1);
+            color: rgba(248, 192, 87, 1);
+          }
+          &.color3 {
+            background: rgba(255, 69, 48, 0.1);
+            color: rgba(255, 69, 48);
+          }
+        }
+      }
+    }
+  }
+}
+.Safe {
+  color: #17c684;
+}
+.footer {
+  font-size: 16px;
+  color: #7f7e7e;
+  padding-bottom: 16px;
+}
+.Warning {
+  color: #ffad00;
+}
+
+.Danger {
+  color: #ea3943;
+}
+.search-wrap {
+  padding-top: 16px;
+  background-color: #f5f7f9;
+  position: sticky;
+  top: 44px;
 }
 </style>

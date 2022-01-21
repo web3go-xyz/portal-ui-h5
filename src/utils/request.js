@@ -18,7 +18,8 @@ service.interceptors.request.use(
             // please modify it according to the actual situation
             config.headers['Authorization'] = `Bearer ${userInfo.token}`;
         }
-        return config
+        config.headers['Host'] = `web3go.xyz`;
+        return config;
     },
     error => {
         // do something with request error

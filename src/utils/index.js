@@ -121,7 +121,7 @@ export function html2Img(el, transferSuccessFn) {
             formData.append("file", file2);
             imgUpload(formData).then(d => {
               resolve({
-                address: `https://web3go.xyz/img/${d}`,
+                address: `https://app.web3go.xyz/img/${d}`,
                 base64: canvas1.toDataURL()
               });
             });
@@ -152,7 +152,7 @@ export function share(jumpUrl, imgUrl, title) {
 
   metaParams = encodeURIComponent(encodeURIComponent(metaParams));
 
-  let backInterfaceUrl = `https://web3go.xyz/portal/twittershare?meta=${metaParams}`;
+  let backInterfaceUrl = `https://app.web3go.xyz/portal/twittershare?meta=${metaParams}`;
   let fullUrl = `https://twitter.com/share?text=${title}&url=${backInterfaceUrl}`;
   window.open(fullUrl);
 }

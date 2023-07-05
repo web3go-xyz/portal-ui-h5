@@ -158,7 +158,7 @@ export default {
         formData.append("file", file);
         imgUpload(formData).then((d) => {
           this.open = false;
-          this.$set(this.options, "img", `https://web3go.xyz/img/${d}`);
+          this.$set(this.options, "img", `https://app.web3go.xyz/img/${d}`);
           this.visible = false;
         });
       });
